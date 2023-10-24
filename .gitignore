@@ -1,2 +1,5 @@
 # Ignore the cred.py file
 cred.py
+
+# Ignore the pycache
+__pycache__
