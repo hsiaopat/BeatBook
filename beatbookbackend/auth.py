@@ -23,7 +23,7 @@ def request_client_credentials_access_token():
 #   The auth_code will come from the redirect_uri url
 def request_authcode_access_token(auth_code):
     url = 'https://accounts.spotify.com/api/token'
-    redirect_uri = 'http://localhost:3000/callback'
+    redirect_uri = 'http://129.74.153.235:5028/callback'
     cred = f'{client_ID}:{client_SECRET}'
     cred = base64.b64encode(cred.encode('ascii')).decode('ascii')
 
@@ -48,7 +48,7 @@ def request_authcode_access_token(auth_code):
 #   The GET request will provide a code which will be used to request a token
 def request_user_authorization():
     url = 'https://accounts.spotify.com/authorize'
-    redirect_uri = 'http://localhost:3000/callback'
+    redirect_uri = 'http://129.74.153.235:5028/callback'
 
     # The scope parameter will determine the user data that they are consenting access to
     # Different API endpoints will require different scopes which will be specified on the API website
@@ -60,6 +60,7 @@ def request_user_authorization():
     }
 
     r = requests.get(url, params=params) 
+    return r.text
 
 
 # This is an arbitrary function to scrape the Morgan Wallen I am currently listening to
