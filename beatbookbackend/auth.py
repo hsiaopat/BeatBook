@@ -18,6 +18,7 @@ def request_client_credentials_access_token():
     # returns header for future API requests
     return {'Authorization' : 'Bearer ' + r.json()['access_token']}
 
+
 # Request Authorization Code Access Token
 #   Step 2 of being able to access user specific data
 #   The auth_code will come from the redirect_uri url
@@ -38,9 +39,7 @@ def request_authcode_access_token(auth_code):
     }
     r = requests.post(url, headers=headers, data=data)
 
-    # currently using this for debugging, once it works we will want to return
-    print(r.text)
-    #return {'Authorization' : 'Bearer ' + r.json()['access_token']}
+    return {'Authorization' : 'Bearer ' + r.json()['access_token']}
 
 
 # Request User Authorization
@@ -49,18 +48,31 @@ def request_authcode_access_token(auth_code):
 def request_user_authorization():
     url = 'https://accounts.spotify.com/authorize'
     redirect_uri = 'http://129.74.153.235:5028/callback'
+    scope = [
+        'user-read-private',
+        'user-read-email',
+        'playlist-read-collaborative',
+        'playlist-modify-public',
+        'playlist-read-private',
+        'playlist-modify-private',
+        'user-top-read',
+        'user-read-recently-played',
+        'user-library-modify',
+        'user-library-read'
+    ]
+    scope_str = ' '.join(scope)
 
     # The scope parameter will determine the user data that they are consenting access to
     # Different API endpoints will require different scopes which will be specified on the API website
     params = {
         'response_type' : 'code',
         'client_id' : client_ID,
-        'scope' : 'user-read-private user-read-email',
+        'scope' : scope_str,
         'redirect_uri' : redirect_uri 
     }
 
     r = requests.get(url, params=params) 
-    return r.text
+    return r.url
 
 
 # This is an arbitrary function to scrape the Morgan Wallen I am currently listening to
@@ -69,6 +81,12 @@ def get_album(headers):
     album_id = '6i7mF7whyRJuLJ4ogbH2wh'
     r = requests.get(url=f'https://api.spotify.com/v1/albums/{album_id}', headers=headers)
     print(r.json()['name'])
+
+
+# Get Spotify user profile
+def get_user(headers):
+    r = requests.get(url='https://api.spotify.com/v1/me', headers=headers)
+    return r.json()['display_name']
 
 
 if __name__ == '__main__':
