@@ -75,20 +75,6 @@ def request_user_authorization():
     return r.url
 
 
-# This is an arbitrary function to scrape the Morgan Wallen I am currently listening to
-#   Proves that the client credentials access token works
-def get_album(headers):
-    album_id = '6i7mF7whyRJuLJ4ogbH2wh'
-    r = requests.get(url=f'https://api.spotify.com/v1/albums/{album_id}', headers=headers)
-    print(r.json()['name'])
-
-
-# Get Spotify user profile
-def get_user(headers):
-    r = requests.get(url='https://api.spotify.com/v1/me', headers=headers)
-    return r.json()['display_name']
-
-
 if __name__ == '__main__':
     # Get the access token and use the API to get data on an album
     #headers = request_client_credentials_access_token()
