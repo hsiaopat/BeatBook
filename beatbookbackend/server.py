@@ -4,6 +4,8 @@ from flask_mysqldb import MySQL
 from auth import *
 from spotify_api import *
 
+import pprint
+
 # Create a new flask instance
 app = Flask(__name__)
 
@@ -32,6 +34,9 @@ def home():
         cursor.execute("select display_name from Users where username = username");
         display_name = cursor.fetchall()[0][0]
         cursor.close()
+
+        tracks = get_user_top_tracks(mysql, headers)
+        artists = get_user_top_artists(mysql, headers)
 
         return (f'Hello {display_name}')
     return 'Hello World'
