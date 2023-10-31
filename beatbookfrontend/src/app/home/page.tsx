@@ -11,10 +11,14 @@ const Container = styled('div')({
   height: '100vh',
 });
 
-const WhiteBackground = styled('div')({
-  background: 'white',
+const HeaderBackground = styled('div')({
+  background: 'darkseagreen',
   width: '100%',
   borderBottom: '1px solid black',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '1rem',
 });
 
 const Title = styled('h1')({
@@ -22,50 +26,67 @@ const Title = styled('h1')({
   color: 'black',
   margin: 0,
   textAlign: 'center',
-  padding: '1rem 0',
+  marginLeft: '44.5%'
 });
 
 const CenteredButtons = styled('div')({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
   flex: 1,
 });
 
 const GreenButton = styled(Button)({
-  backgroundColor: 'forestgreen',
+  backgroundColor: 'darkseagreen',
   color: 'black',
-  fontSize: '1rem',
-  margin: '1rem 0',
+  fontSize: '1.2rem', // Slightly larger font size
+  padding: '1rem 2rem', // Increase button padding for larger size
+  margin: '10rem 0',
+});
+const WelcomeMessage = styled('div')({
+  backgroundColor: 'white', // Change the background color to pale green
+  border: '1px solid black',
+  padding: '1rem',
+  textAlign: 'center',
+  width: '65%',
+  marginTop: '1rem', // Move closer to the black line
 });
 
+
 const SpotifyLoginButton = styled(Button)({
-  backgroundColor: 'lightblue', // Customize the background color for the Spotify login button
-  color: 'black', // Text color
+  backgroundColor: 'white',
+  color: 'black',
   fontSize: '1rem',
-  margin: '1rem 0',
+  marginRight: '1rem',
+  marginBottom: '1rem',
 });
 
 const HomePage = () => {
   const redirectToSpotify = () => {
     // Save the user ID or perform any other necessary actions
-    const userId = 'your-user-id'; // Replace with actual user ID
+    const userId = 'your-user-id'; // Replace with the actual user ID
     // Redirect to the Spotify login page
     window.location.href = 'https://accounts.spotify.com';
   };
 
   return (
     <Container>
-      <WhiteBackground>
+      <HeaderBackground>
         <Title>BeatBook</Title>
-      </WhiteBackground>
-      <CenteredButtons>
         <SpotifyLoginButton variant="contained" onClick={redirectToSpotify}>
-          Log in to Spotify
+          Spotify Login
         </SpotifyLoginButton>
+      </HeaderBackground>
+      <CenteredButtons>
+      <WelcomeMessage>
+          Welcome to BeatBook, a “book club” for music albums. 
+          Login to your Spotify account and join a group of other users.
+          From your personal music listening statistics, the “club” will 
+          recommend an album to listen to that week that you can then rank and make comments about.
+           The groups ranking of that weeks album can then help determine future albums to recommend to you.
+      </WelcomeMessage>
         <Link href="/group-login">
-          <GreenButton variant="contained">Group Login</GreenButton>
+          <GreenButton variant="contained">Join Group</GreenButton>
         </Link>
       </CenteredButtons>
     </Container>
