@@ -115,7 +115,7 @@ const HomePage = () => {
         <Title>BeatBook</Title>
       </WhiteBackground>
       <CenteredButton>
-        <Link href="/group-login">
+        <Link href="../groups/page.tsx">
           <GreenButton variant="contained">Group Login</GreenButton>
         </Link>
       </CenteredButton>
