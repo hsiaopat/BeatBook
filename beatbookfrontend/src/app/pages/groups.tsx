@@ -7,7 +7,7 @@ const GroupsPage: React.FC = () => {
         try {
             const response = await axios.post('/join-group',{userId: 'yourUserId',groupId:'groupIdToJoin'});
             console.log(response.data);
-            //add code to update UI or perform additional actions after joining
+            // add code to update UI or perform additional actions after joining
         } catch (error){
             console.error(error);
         }
@@ -17,7 +17,7 @@ const GroupsPage: React.FC = () => {
         try {
             const response = await axios.post('/leave-group',{userId: 'yourUserId',groupId:'groupIdToJoin'});
             console.log(response.data);
-            //add code to update UI or perform additional actions after leaving
+            // add code to update UI or perform additional actions after leaving
         } catch (error){
             console.error(error);
         }
