@@ -1,71 +1,101 @@
-/* import Link from 'next/link';
+'use client'
+import Link from 'next/link';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import { styled } from '@mui/system'
+import { styled } from '@mui/system';
 
-const containerStyles = {
+const Container = styled('div')({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',
   alignItems: 'center',
   height: '100vh',
-};
+});
 
-const whiteBackgroundStyles = {
-  background: 'white',
+const HeaderBackground = styled('div')({
+  background: 'darkseagreen',
   width: '100%',
   borderBottom: '1px solid black',
-};
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '1rem',
+});
 
-const titleStyles = {
+const Title = styled('h1')({
   fontSize: '2rem',
   color: 'black',
   margin: 0,
   textAlign: 'center',
-  padding: '1rem 0',
-};
+  marginLeft: '44.5%'
+});
 
-const centeredButtonStyles = {
+const CenteredButtons = styled('div')({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
   flex: 1,
-};
+});
 
-const greenButtonStyles = {
-  backgroundColor: 'forestgreen', // Set the background color to green
-  color: 'black', // Set the text color to black
+const GreenButton = styled(Button)({
+  backgroundColor: 'darkseagreen',
+  color: 'black',
+  fontSize: '1.2rem', // Slightly larger font size
+  padding: '1rem 2rem', // Increase button padding for larger size
+  margin: '10rem 0',
+});
+const WelcomeMessage = styled('div')({
+  backgroundColor: 'white', // Change the background color to pale green
+  border: '1px solid black',
+  padding: '1rem',
+  textAlign: 'center',
+  width: '65%',
+  marginTop: '1rem', // Move closer to the black line
+});
+
+
+const SpotifyLoginButton = styled(Button)({
+  backgroundColor: 'white',
+  color: 'black',
   fontSize: '1rem',
-  margin: '1rem 0',
-  '&:hover': {
-    backgroundColor: 'forestgreen', // Set the background color to green on hover
-  },
-};
+  marginRight: '1rem',
+  marginBottom: '1rem',
+});
 
 const HomePage = () => {
+  const redirectToSpotify = () => {
+    // Save the user ID or perform any other necessary actions
+    const userId = 'your-user-id'; // Replace with the actual user ID
+    // Redirect to the Spotify login page
+    window.location.href = 'https://accounts.spotify.com';
+  };
+
   return (
-    <Box sx={containerStyles}>
-      <Box sx={whiteBackgroundStyles}>
-        <Box sx={titleStyles}>BeatBook</Box>
-      </Box>
-      <Box sx={centeredButtonStyles}>
+    <Container>
+      <HeaderBackground>
+        <Title>BeatBook</Title>
+        <SpotifyLoginButton variant="contained" onClick={redirectToSpotify}>
+          Spotify Login
+        </SpotifyLoginButton>
+      </HeaderBackground>
+      <CenteredButtons>
+      <WelcomeMessage>
+          Welcome to BeatBook, a “book club” for music albums. 
+          Login to your Spotify account and join a group of other users.
+          From your personal music listening statistics, the “club” will 
+          recommend an album to listen to that week that you can then rank and make comments about.
+           The groups ranking of that weeks album can then help determine future albums to recommend to you.
+      </WelcomeMessage>
         <Link href="/group-login">
-          <Button sx={greenButtonStyles} variant="contained">
-            Group Login
-          </Button>
+          <GreenButton variant="contained">Join Group</GreenButton>
         </Link>
-      </Box>
-    </Box>
+      </CenteredButtons>
+    </Container>
   );
 };
 
 export default HomePage;
 
-*/
-
-
-'use client'
+/* 'use client'
 import Link from 'next/link';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
@@ -115,7 +145,7 @@ const HomePage = () => {
         <Title>BeatBook</Title>
       </WhiteBackground>
       <CenteredButton>
-        <Link href="/group-login">
+        <Link href="">
           <GreenButton variant="contained">Group Login</GreenButton>
         </Link>
       </CenteredButton>
@@ -124,3 +154,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+*/
