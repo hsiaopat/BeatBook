@@ -7,8 +7,22 @@ import Header from '../components/header';
 const GroupsPage: React.FC = () => {
   const handleJoinGroup = async () => {
     try {
-      const response = await axios.post('/join-group', { userId: 'yourUserId', groupId: 'groupIdToJoin' });
-      console.log(response.data);
+      const spotifyAuthUrl = 'http://129.74.153.235:5028/join-group';
+      window.location.href = spotifyAuthUrl;
+      //const response = await axios.post('/join-group');
+      //console.log(response.data);
+      // add code to update UI or perform additional actions after joining
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleCreateGroup = async () => {
+    try {
+      const spotifyAuthUrl = 'http://129.74.153.235:5028/create-group';
+      window.location.href = spotifyAuthUrl;
+      //const response = await axios.post('/join-group');
+      //console.log(response.data);
       // add code to update UI or perform additional actions after joining
     } catch (error) {
       console.error(error);
@@ -17,7 +31,7 @@ const GroupsPage: React.FC = () => {
 
   const handleLeaveGroup = async () => {
     try {
-      const response = await axios.post('/leave-group', { userId: 'yourUserId', groupId: 'groupIdToJoin' });
+      const response = await axios.post('/leave-group');
       console.log(response.data);
       // add code to update UI or perform additional actions after leaving
     } catch (error) {
@@ -35,14 +49,21 @@ const GroupsPage: React.FC = () => {
       handleLeaveGroup();
     };
 
+    const handleCreateGroupClient = () => {
+      handleCreateGroup();
+    };
+
     // Attach the client-side event handlers
     document.getElementById('joinGroupButton')?.addEventListener('click', handleJoinGroupClient);
     document.getElementById('leaveGroupButton')?.addEventListener('click', handleLeaveGroupClient);
+    document.getElementById('createGroupButton')?.addEventListener('click', handleCreateGroupClient);
 
     // Clean up the event handlers when the component unmounts
     return () => {
       document.getElementById('joinGroupButton')?.removeEventListener('click', handleJoinGroupClient);
       document.getElementById('leaveGroupButton')?.removeEventListener('click', handleLeaveGroupClient);
+      document.getElementById('createGroupButton')?.removeEventListener('click', handleCreateGroupClient);
+
     };
   }, []); // Empty dependency array ensures the effect runs only once on mount
 
@@ -59,11 +80,19 @@ const GroupsPage: React.FC = () => {
           </Button>
 
           <Button
+            id="createGroupButton"
+            variant="contained"
+          >
+            Create Group
+          </Button>
+
+          <Button
             id="leaveGroupButton"
             variant="contained"
           >
             Leave Group
           </Button>
+
         </div>
       </div>
     </div>
