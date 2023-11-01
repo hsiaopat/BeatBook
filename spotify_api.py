@@ -118,7 +118,7 @@ def get_user_top_artists(mysql, headers):
 
     return artists, artists_id
 
-
+'''
 def get_artists_genre(mysql, headers,id):
     url = 'https://api.spotify.com/v1/artists/{0}/'.format(id)
     params = {
@@ -133,10 +133,16 @@ def get_user_stats(mysql, headers):
     username = get_user(mysql, headers)
     tracks, track_ids = get_user_top_tracks(mysql,headers)
     cursor = mysql.connection.cursor()
-    cursor.execute("select Artist_ID from User_Tracks where username = '%s'" % username);
+    command = "select Track_ID from User_Tracks where username = '%s'" % username
+    print(command)
+    cursor.execute(command)
     artist_id = [row[0] for row in cursor.fetchall()]
-    cursor.execute("select Artist_name from Tracks");
-    artists = [row[0] for row in cursor.fetchall()]
+    artists = []
+    for x in range(len(artist_id)):
+        command = "select Artist_name from Tracks where Artist_ID = '%s'" % artist_id[x]
+        cursor.execute(command)
+        art = [row[0] for row in cursor.fetchall()]
+        artists.append(art)
     command = "select display_name from Users where username = '%s'" % username
     cursor.execute(command)
     name = str([row[0] for row in cursor.fetchall()])
@@ -147,6 +153,7 @@ def get_user_stats(mysql, headers):
     for x in range(len(artist_id)):
         art_id = artist_id[x]
         art_name = artists[x]
+        print(art_id)
         gen = get_artists_genre(mysql,headers,art_id)
         genres.extend(gen)
         art.append(art_name)
@@ -172,7 +179,7 @@ def get_user_stats(mysql, headers):
         cursor.execute(command);
         cursor.connection.commit()
         cursor.close()
-
+'''
 #NOT IMPLEMENTED YET OR TESTED
 def join_group(mysql,headers, g_id):
     cursor = mysql.connection.cursor()
@@ -185,14 +192,16 @@ def join_group(mysql,headers, g_id):
     cursor.execute("show tables")
     tables = [row[0] for row in cursor.fetchall()]
     group_name_id = 'Group_%s' % g_id
-    if (g_id in groups_ids and group_name_id in tables):
+    if g_id in groups_ids:
         command = "select Member_username from %s" % group_name_id
         cursor.execute(command)
         current_members = [row[0] for row in cursor.fetchall()]
         if username not in current_members:
             cursor.execute("insert into Group_%s (Member_username, Member_name) values (%s, %s)",
                 (g_id, username, name))
-            cursor.execute("update Clubs set num_members = num_members+1 where group_id = '%s'" , g_id)
+            command = "update Clubs set num_members = num_members+1 where group_id = '%s'" % str(g_id)
+            print(command)
+            cursor.execute(command)
             cursor.connection.commit()
             cursor.close()
         else:
@@ -203,22 +212,26 @@ def join_group(mysql,headers, g_id):
 #NOT IMPLEMENTED OR TESTED
 def create_group(mysql, headers, group_name):
     username = get_user(mysql, headers)
-    cursor.mysql.connection.cursor()
+    cursor = mysql.connection.cursor()
     command = "select display_name from Users where username = '%s'" % username
     cursor.execute(command)
-    name = [row[0] for row in cursor.fetchall()]
+    name = [row[0] for row in cursor.fetchall()][0]
+    print(cursor.fetchall())
+    print(name) 
     cursor.execute("select group_id from Clubs")
     groups_ids = [row[0] for row in cursor.fetchall()]
     cursor.execute("select group_id from Clubs order by group_id desc limit 1")
-    new_id = [row[0] for row in cursor.fetchall()]+1
-    while new_id in groups_ids:
-        new_id = new_id+1
+    #new_id = [row[0] for row in cursor.fetchall()]
+    new_id = 1
+   # while new_id in groups_ids:
+   #     new_id = new_id+1
     if new_id not in groups_ids:
         cursor.execute("insert into Clubs (group_id, group_name, num_members) values (%s, %s, 1)",
             (new_id, group_name))
-        command = "create table Group_%s(Member_username varchar(50) primary key, Member_name varchar(100)" % new_id
+        command = "create table Group_%s(Member_username varchar(50) primary key, Member_name varchar(100))" % new_id
         cursor.execute(command)
-        command = "insert into Group_%s (Member_username, Member_name) values (%s, %s)" % (username, name)
+        command = "insert into Group_%s (Member_username, Member_name) values ('%s', '%s')" % (new_id, username, name)
+        print(command)
         cursor.execute(command)
         cursor.connection.commit()
         cursor.close()
@@ -227,7 +240,7 @@ def create_group(mysql, headers, group_name):
 #NOT IMPLEMENTED OR TESTED
 def leave_group(mysql, headers, group_id):
     username = get_user(mysql, headers)
-    cursor.mysql.connection.cursor()
+    cursor = mysql.connection.cursor()
     group_name_id = "Group_%s" % group_id
     cursor.execute("show tables")
     tables = [row[0] for row in cursor.fetchall()]
@@ -237,9 +250,9 @@ def leave_group(mysql, headers, group_id):
         current_members = [row[0] for row in cursor.fetchall()]
         if username in current_members:
             #USES DELETE NEED TO EVALUATE
-            command = "delete from Group_%s where Member_username = '%s" % (group_id, username)
+            command = "delete from Group_%s where Member_username = '%s'" % (group_id, username)
             cursor.execute(command)
-            command = "update Clubs set num_members = num_members-1 where group_id = '%s'" % group_id
+            command = "update Clubs set num_members = num_members-1 where group_id = '%s'" % str(group_id)
             cursor.execute(command)
             cursor.connection.commit()
             cursor.close()
@@ -247,3 +260,47 @@ def leave_group(mysql, headers, group_id):
 #NEED TO FIGURE OUT WHO CAN DELETE GROUPS
 def delete_group(mysql, headers):
     print("Help")
+
+
+def display_top_tracks(mysql, headers):
+    cursor = mysql.connection.cursor();
+    username = get_user(mysql, headers)
+    command = "select Track_ID from User_Tracks where username = '%s'" % username
+    cursor.execute(command)
+    tracks_id = [row[0] for row in cursor.fetchall()]
+    display = []
+    for x in range(len(tracks_id)):
+        command = "select Track_name, Artist_name, Album_name, duration, popularity from Tracks where Track_ID = '%s'" %tracks_id[x] 
+        cursor.execute(command)
+        data = cursor.fetchall()
+        display.append(data)
+    cursor.connection.commit()
+    cursor.close()
+    print(display)
+    return display
+def display_top_artists(mysql, headers):
+    cursor = mysql.connection.cursor();
+    username = get_user(mysql, headers)
+    command = "select Artist_ID from User_Artist where username = '%s'" % username
+    cursor.execute(command)
+    artists_id = [row[0] for row in cursor.fetchall()]
+    display = []
+    for x in range(len(artists_id)):
+        command = "select Artist_ID, Artist_name from Artist where Artist_ID = '%s'" %artists_id[x]
+        cursor.execute(command)
+        data = cursor.fetchall()
+        display.append(data)
+    cursor.connection.commit()
+    cursor.close()
+    print(display)
+    return display
+
+def display_groups(mysql, headers):
+    cursor = mysql.connection.cursor()
+    command = "select group_id, group_name, num_members from Clubs"
+    cursor.execute(command)
+    display = cursor.fetchall()
+    cursor.connection.commit()
+    cursor.close()
+    print(display)
+    return display
