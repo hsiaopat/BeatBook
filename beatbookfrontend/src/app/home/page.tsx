@@ -10,7 +10,7 @@ const Container = styled('div')({
   justifyContent: 'flex-start',
   alignItems: 'center',
   height: '100vh',
-});
+}); 
 
 const HeaderBackground = styled('div')({
   background: 'darkseagreen',
