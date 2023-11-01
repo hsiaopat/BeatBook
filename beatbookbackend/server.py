@@ -3,9 +3,16 @@ from flask import redirect, session
 from flask_mysqldb import MySQL
 from auth import *
 from spotify_api import *
+from flask import jsonify  
+from flask_cors import CORS
+import logging
+
+
 
 # Create a new flask instance
 app = Flask(__name__)
+logging.getLogger('flask_cors').level = logging.DEBUG
+CORS(app, resources={r"/toptracks": {"origins": "*"}})
 
 # Global headers variable
 headers = {}
@@ -28,7 +35,7 @@ def home():
         username = get_user(mysql, headers)
         tracks, tracks_id = get_user_top_tracks(mysql, headers)
         artists,artists_id = get_user_top_artists(mysql,headers)
-        get_user_stats(mysql,headers)
+        #get_user_stats(mysql,headers)
         # Select from the database to get the user display_name
         cursor = mysql.connection.cursor()
         cursor.execute("select display_name from Users where username = username");
@@ -52,6 +59,23 @@ def callback():
     global headers
     headers = request_authcode_access_token(request.args.get('code'))
     return redirect('/')
+
+@app.route('/toptracks')
+def top_tracks():
+    global headers
+
+    if 'Authorization' in headers:
+        # Get the username from the get_user Spotify API call
+        username = get_user(mysql, headers)
+
+        # Get the user's top tracks
+        tracks, tracks_id = get_user_top_tracks(mysql, headers)
+        print(tracks)
+        # Render a template or return the data in JSON format
+        return jsonify({'tracks': tracks, 'tracks_id': tracks_id})
+
+    return 'Hello World'
+
 
 
 if __name__ == '__main__':
