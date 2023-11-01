@@ -100,12 +100,12 @@ const HomePage = () => {
           recommend an album to listen to that week that you can then rank and make comments about.
            The groups ranking of that weeks album can then help determine future albums to recommend to you.
       </WelcomeMessage>
-      <Link href="/topartist">
+      <Link href="/topartists">
       <TopGreenButton variant="contained">
-          Display Top Artist
+          Display Top Artists
         </TopGreenButton>
       </Link>
-      <Link href="toptracks">
+      <Link href="/toptracks">
         <TopGreenButton variant="contained">
           Display Top Tracks
         </TopGreenButton>

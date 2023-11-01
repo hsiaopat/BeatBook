@@ -29,7 +29,7 @@ def get_user_top_tracks(mysql, headers):
     url = 'https://api.spotify.com/v1/me/top/tracks'
     params = {
         'time_range': 'short_term',    # short-term: 4 weeks, medium_term: 6 months, long term: years
-        'limit': 20,       # max is 50
+        'limit': 50,       # max is 50
         'offset': 0       # start from the first item
     }
 
@@ -82,12 +82,13 @@ def get_user_top_artists(mysql, headers):
     url = 'https://api.spotify.com/v1/me/top/artists'
     params = {
         'time_range': 'short_term',    # short-term: 4 weeks, medium_term: 6 months, long term: years
-        'limit': 20,       # max is 50
+        'limit': 50,       # max is 50
         'offset': 0       # start from the first item
     }
 
     data = requests.get(url=url, params=params, headers=headers).json()
     artists = []
+    artists_id_db = []
     artists_id = []
     username = get_user(mysql, headers)
     for item in data['items']:
@@ -98,7 +99,7 @@ def get_user_top_artists(mysql, headers):
         # Select the artist id from the database
         cursor = mysql.connection.cursor()
         cursor.execute("select Artist_ID from Artist");
-        artists_id = [row[0] for row in cursor.fetchall()]
+        artists_id_db = [row[0] for row in cursor.fetchall()]
         cursor.execute("select Artist_ID, username from User_Artist")
         User_Artists = cursor.fetchall()
         Art_User = '_'.join([artist_id , username])
@@ -110,7 +111,7 @@ def get_user_top_artists(mysql, headers):
             cursor.execute("insert into User_Artist (Artist_ID, username) values (%s, %s)" ,
                  (artist_id, username))
         # If the artist id does not already exist, add to the database
-        if artist_id not in artists_id:
+        if artist_id not in artists_id_db:
             cursor.execute("insert into Artist (Artist_ID, Artist_name) values (%s, %s)", 
                 (artist_id, artist_name));
             cursor.connection.commit()
@@ -203,6 +204,7 @@ def join_group(mysql,headers, g_id):
 #NOT IMPLEMENTED OR TESTED
 def create_group(mysql, headers, group_name):
     username = get_user(mysql, headers)
+    cursor = mysql.connection.cursor()
     cursor.mysql.connection.cursor()
     command = "select display_name from Users where username = '%s'" % username
     cursor.execute(command)
@@ -227,6 +229,7 @@ def create_group(mysql, headers, group_name):
 #NOT IMPLEMENTED OR TESTED
 def leave_group(mysql, headers, group_id):
     username = get_user(mysql, headers)
+    cursor = mysql.connection.cursor()
     cursor.mysql.connection.cursor()
     group_name_id = "Group_%s" % group_id
     cursor.execute("show tables")

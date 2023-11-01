@@ -12,7 +12,8 @@ import logging
 # Create a new flask instance
 app = Flask(__name__)
 logging.getLogger('flask_cors').level = logging.DEBUG
-CORS(app, resources={r"/toptracks": {"origins": "*"}})
+CORS(app, resources={r"/toptracks": {"origins": "*"},
+                     r"/topartists": {"origins": "*"}})
 
 # Global headers variable
 headers = {}
@@ -73,6 +74,22 @@ def top_tracks():
         print(tracks)
         # Render a template or return the data in JSON format
         return jsonify({'tracks': tracks, 'tracks_id': tracks_id})
+
+    return 'Hello World'
+
+@app.route('/topartists')
+def top_artists():
+    global headers
+
+    if 'Authorization' in headers:
+        # Get the username from the get_user Spotify API call
+        username = get_user(mysql, headers)
+
+        # Get the user's top tracks
+        artists, artists_id = get_user_top_artists(mysql, headers)
+        print(artists)
+        # Render a template or return the data in JSON format
+        return jsonify({'artists': artists, 'artists_id': artists_id})
 
     return 'Hello World'
 
