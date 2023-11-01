@@ -72,12 +72,12 @@ const GroupsPage: React.FC = () => {
       <Header />
       <div className="bg-spotify-dark min-h-screen flex flex-col items-center justify-center text-spotify-white">
         <div className="space-x-4">
-          <Button
-            id="joinGroupButton"
-            variant="contained"
-          >
-            Join Group
-          </Button>
+        <Button
+          id="joinGroupButton"
+          variant="contained"
+         >
+        Join Group
+      </Button>
 
           <Button
             id="createGroupButton"

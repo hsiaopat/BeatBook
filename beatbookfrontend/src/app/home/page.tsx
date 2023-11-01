@@ -42,8 +42,17 @@ const GreenButton = styled(Button)({
   color: 'black',
   fontSize: '1.2rem', // Slightly larger font size
   padding: '1rem 2rem', // Increase button padding for larger size
-  margin: '10rem 0',
+  margin: '1rem 0',
 });
+
+const TopGreenButton = styled(Button)({
+  backgroundColor: 'darkseagreen',
+  color: 'black',
+  fontSize: '1.2rem', // Slightly larger font size
+  padding: '1rem 2rem', // Increase button padding for larger size
+  margin: '1rem 0',
+});
+
 const WelcomeMessage = styled('div')({
   backgroundColor: 'white', // Change the background color to pale green
   border: '1px solid black',
@@ -62,18 +71,13 @@ const SpotifyLoginButton = styled(Button)({
   marginBottom: '1rem',
 });
 
+
+
 const HomePage = () => {
   const redirectToSpotify = async () => {
     try {
-      // Make a request to your Flask backend endpoint to initiate Spotify login
-      const response = await axios.get('http://localhost:5028/login'); // Adjust the URL as needed
-  
-      // If the backend response contains a URL, redirect the user to that URL
-      if (response.data && response.data.spotifyAuthUrl) {
-        window.location.href = response.data.spotifyAuthUrl;
-      } else {
-        console.error('Invalid backend response');
-      }
+      const spotifyAuthUrl = 'http://129.74.153.235:5028/login';
+      window.location.href = spotifyAuthUrl;
     } catch (error) {
       console.error('Error initiating Spotify login:', error);
     }
@@ -96,6 +100,16 @@ const HomePage = () => {
           recommend an album to listen to that week that you can then rank and make comments about.
            The groups ranking of that weeks album can then help determine future albums to recommend to you.
       </WelcomeMessage>
+      <Link href="/topartist">
+      <TopGreenButton variant="contained">
+          Display Top Artist
+        </TopGreenButton>
+      </Link>
+      <Link href="toptracks">
+        <TopGreenButton variant="contained">
+          Display Top Tracks
+        </TopGreenButton>
+        </Link>
         <Link href="/groups">
           <GreenButton variant="contained">Join Group</GreenButton>
         </Link>
