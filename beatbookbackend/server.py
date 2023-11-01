@@ -10,10 +10,10 @@ app = Flask(__name__)
 # Global headers variable
 headers = {}
 
-app.secret_key='chackl'
+app.secret_key='mschmi26'
 
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'chackl'
+app.config['MYSQL_USER'] = 'mschmi26'
 app.config['MYSQL_PASSWORD'] = 'goirish'
 app.config['MYSQL_DB'] = 'chackl'
 
@@ -26,7 +26,9 @@ def home():
     if 'Authorization' in headers:
         # Get the username from get_user spotify API call
         username = get_user(mysql, headers)
-
+        tracks, tracks_id = get_user_top_tracks(mysql, headers)
+        artists,artists_id = get_user_top_artists(mysql,headers)
+        get_user_stats(mysql,headers)
         # Select from the database to get the user display_name
         cursor = mysql.connection.cursor()
         cursor.execute("select display_name from Users where username = username");
