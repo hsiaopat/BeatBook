@@ -13,7 +13,11 @@ import logging
 app = Flask(__name__)
 logging.getLogger('flask_cors').level = logging.DEBUG
 CORS(app, resources={r"/toptracks": {"origins": "*"},
-                     r"/topartists": {"origins": "*"}})
+                     r"/topartists": {"origins": "*"},
+                     r"/joingroup": {"origins": "*"},
+                     r"/creategroup": {"origins": "*"},
+                     r"/leavegroup": {"origins": "*"},
+                     r"/displaygroups": {"origin": "*"}})
 
 # Global headers variable
 headers = {}
@@ -93,6 +97,78 @@ def top_artists():
 
     return 'Hello World'
 
+@app.route('/joingroup', methods=['POST'])
+def join_group_route():
+    global headers
+    print(request.json)
+    if 'Authorization' not in headers:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    g_id = request.json.get('group_identifier')  # Assuming the group_id is passed in the request JSON
+    if not g_id:
+        return jsonify({"error": "Group ID not provided"}), 400
+
+    # Call your join_group function here
+    result, message = join_group(mysql, headers, g_id)
+
+    if result:
+        return jsonify({"success": True, "message": message})
+    else:
+        return jsonify({"success": False, "error": message})
+    
+
+@app.route('/creategroup', methods=['POST'])
+def create_group_route():
+    global headers
+
+    if 'Authorization' not in headers:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    group_name = request.json.get('group_name')  # Assuming the group_name is passed in the request JSON
+    if not group_name:
+        return jsonify({"error": "Group name not provided"}), 400
+
+    # Call your create_group function here
+    result, message = create_group(mysql, headers, group_name)
+
+    if result:
+        return jsonify({"success": True, "message": message})
+    else:
+        return jsonify({"success": False, "error": message})
+    
+
+@app.route('/leavegroup', methods=['POST'])
+def leave_group_route():
+    global headers
+
+    if 'Authorization' not in headers:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    group_identifier = request.json.get('group_identifier')  # Assuming the group_id is passed in the request JSON
+    if not group_identifier:
+        return jsonify({"error": "Group ID not provided"}), 400
+
+    # Call your leave_group function here
+    result, message = leave_group(mysql, headers, group_identifier)
+
+    if result:
+        return jsonify({"success": True, "message": message})
+    else:
+        return jsonify({"success": False, "error": message})
+    
+@app.route('/displaygroups')
+def display_groups_route():
+    global headers
+
+    if 'Authorization' not in headers:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    # Call your display_groups function here
+    groups = display_groups(mysql, headers)
+    print(groups)
+
+    # Render a template or return the data in JSON format
+    return jsonify({'groups': groups})
 
 
 if __name__ == '__main__':
