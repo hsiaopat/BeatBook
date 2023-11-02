@@ -63,7 +63,7 @@ def callback():
     #   from the Spotify API
     global headers
     headers = request_authcode_access_token(request.args.get('code'))
-    return redirect('/')
+    return redirect('http://129.74.153.235:5029/')
 
 @app.route('/toptracks')
 def top_tracks():
