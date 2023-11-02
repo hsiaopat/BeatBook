@@ -43,7 +43,7 @@ def home():
         #get_user_stats(mysql,headers)
         # Select from the database to get the user display_name
         cursor = mysql.connection.cursor()
-        cursor.execute("select display_name from Users where username = username");
+        cursor.execute("select display_name from Users where username = %s", (username,));
         display_name = cursor.fetchall()[0][0]
         cursor.close()
 
