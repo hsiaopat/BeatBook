@@ -24,96 +24,102 @@ def get_user(mysql, headers):
 
     return username
 
-# Get user top tracks
+# Get user top tracks for short, medium and long term
 def get_user_top_tracks(mysql, headers):
-    url = 'https://api.spotify.com/v1/me/top/tracks'
-    params = {
-        'time_range': 'short_term',    # short-term: 4 weeks, medium_term: 6 months, long term: years
-        'limit': 50,       # max is 50
-        'offset': 0       # start from the first item
-    }
+    times = ['short_term', 'medium_term', 'long_term']
+    for time in times:
 
-    data = requests.get(url=url, params=params, headers=headers).json()
-    username = get_user(mysql, headers)
-    tracks = []
-    tracks_id = []
-    for item in data['items']:
-        track_name = item['name']
-        tracks.append(track_name)
-        track_id = item['id']
-        tracks_id.append(track_id)
-        for art in item['artists']:
-            track_art_id = art['id']
-            track_art_name = art['name']
-            break
-        track_album_id = item['album']['id']
-        track_album_name =item['album']['name']
-        track_duration = item['duration_ms']
-        track_popular = item['popularity']
-        #Select the Track Id from the database
-        cursor = mysql.connection.cursor()
-        cursor.execute("select Track_ID from Tracks");
-        tracks_id_current = [row[0] for row in cursor.fetchall()]
-        cursor.execute("select Track_ID, username from User_Tracks")
-        User_Tracks = cursor.fetchall()
-        Track_User = '_'.join([track_id , username])
-        User_Track = []
-        for x in range(len(User_Tracks)):
-             User_Track.append('_'.join(User_Tracks[x]))
-        print(Track_User)
-        if Track_User not in User_Track:
-            cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" ,        
-                (track_id, username))
-        #If the Track is not in the db, add
-        if track_id not in tracks_id_current:
-           cursor.execute("insert into Tracks (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity) values (%s, %s, %s, %s, %s, %s, %s, %s)",
-               (track_id, track_name, track_art_id, track_art_name, track_album_id, track_album_name, track_duration, track_popular));
-           #cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" , 
-           #    (track_id, username))
-           cursor.connection.commit()
-           cursor.close() 
+        url = 'https://api.spotify.com/v1/me/top/tracks'
+        params = {
+            'time_range': time,    # short-term: 4 weeks, medium_term: 6 months, long term: years
+            'limit': 50,       # max is 50
+            'offset': 0       # start from the first item
+        }
+
+        data = requests.get(url=url, params=params, headers=headers).json()
+        username = get_user(mysql, headers)
+        tracks = []
+        tracks_id = []
+        for item in data['items']:
+            track_name = item['name']
+            tracks.append(track_name)
+            track_id = item['id']
+            tracks_id.append(track_id)
+            for art in item['artists']:
+                track_art_id = art['id']
+                track_art_name = art['name']
+                break
+            track_album_id = item['album']['id']
+            track_album_name =item['album']['name']
+            track_duration = item['duration_ms']
+            track_popular = item['popularity']
+            #Select the Track Id from the database
+            cursor = mysql.connection.cursor()
+            cursor.execute("select Track_ID from Tracks");
+            tracks_id_current = [row[0] for row in cursor.fetchall()]
+            cursor.execute("select Track_ID, username from User_Tracks")
+            User_Tracks = cursor.fetchall()
+            Track_User = '_'.join([track_id , username])
+            User_Track = []
+            for x in range(len(User_Tracks)):
+                 User_Track.append('_'.join(User_Tracks[x]))
+            print(Track_User)
+            if Track_User not in User_Track:
+                cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" ,        
+                    (track_id, username))
+            #If the Track is not in the db, add
+            if track_id not in tracks_id_current:
+                cursor.execute("insert into Tracks (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity) values (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (track_id, track_name, track_art_id, track_art_name, track_album_id, track_album_name, track_duration, track_popular));
+                #cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" , 
+                #    (track_id, username))
+                cursor.connection.commit()
+                cursor.close() 
     
 
     return tracks, tracks_id
 
 
-# Get user top artists data
-def get_user_top_artists(mysql, headers):
-    url = 'https://api.spotify.com/v1/me/top/artists'
-    params = {
-        'time_range': 'short_term',    # short-term: 4 weeks, medium_term: 6 months, long term: years
-        'limit': 50,       # max is 50
-        'offset': 0       # start from the first item
-    }
+# Get user top artists data for short, medium and long term
+def get_all_user_top_artists(mysql, headers):
+    times = ['short_term', 'medium_term', 'long_term']
+    for time in times:
 
-    data = requests.get(url=url, params=params, headers=headers).json()
-    artists = []
-    artists_id_db = []
-    artists_id = []
-    username = get_user(mysql, headers)
-    for item in data['items']:
-        artist_name = item['name']
-        artists.append(artist_name)
-        artist_id = item['id']
-        artists_id.append(artist_id)
-        # Select the artist id from the database
-        cursor = mysql.connection.cursor()
-        cursor.execute("select Artist_ID from Artist");
-        artists_id_db = [row[0] for row in cursor.fetchall()]
-        cursor.execute("select Artist_ID, username from User_Artist")
-        User_Artists = cursor.fetchall()
-        Art_User = '_'.join([artist_id , username])
-        User_Artist = []
-        for x in range(len(User_Artists)):
-             User_Artist.append('_'.join(User_Artists[x]))
-        print(Art_User)
-        if Art_User not in User_Artist:
-            cursor.execute("insert into User_Artist (Artist_ID, username) values (%s, %s)" ,
-                 (artist_id, username))
-        # If the artist id does not already exist, add to the database
-        if artist_id not in artists_id_db:
-            cursor.execute("insert into Artist (Artist_ID, Artist_name) values (%s, %s)", 
-                (artist_id, artist_name));
+        url = 'https://api.spotify.com/v1/me/top/artists'
+        params = {
+            'time_range': time,    # short-term: 4 weeks, medium_term: 6 months, long term: years
+            'limit': 50,       # max is 50
+            'offset': 0       # start from the first item
+        }
+
+        data = requests.get(url=url, params=params, headers=headers).json()
+        artists = []
+        artists_id_db = []
+        artists_id = []
+        username = get_user(mysql, headers)
+        for item in data['items']:
+            artist_name = item['name']
+            artists.append(artist_name)
+            artist_id = item['id']
+            artists_id.append(artist_id)
+            # Select the artist id from the database
+            cursor = mysql.connection.cursor()
+            cursor.execute("select Artist_ID from Artist");
+            artists_id_db = [row[0] for row in cursor.fetchall()]
+            cursor.execute("select Artist_ID, username from User_Artist")
+            User_Artists = cursor.fetchall()
+            Art_User = '_'.join([artist_id , username])
+            User_Artist = []
+            for x in range(len(User_Artists)):
+                 User_Artist.append('_'.join(User_Artists[x]))
+            print(Art_User)
+            if Art_User not in User_Artist:
+                cursor.execute("insert into User_Artist (Artist_ID, username) values (%s, %s)" ,
+                     (artist_id, username))
+            # If the artist id does not already exist, add to the database
+            if artist_id not in artists_id_db:
+                cursor.execute("insert into Artist (Artist_ID, Artist_name) values (%s, %s)", 
+                    (artist_id, artist_name));
             cursor.connection.commit()
             cursor.close()
 
