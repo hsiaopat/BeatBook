@@ -7,7 +7,7 @@ from flask import jsonify
 from flask_cors import CORS
 import logging
 
-
+from playlist_cluster import *
 
 # Create a new flask instance
 app = Flask(__name__)
@@ -30,6 +30,11 @@ app.config['MYSQL_PASSWORD'] = 'goirish'
 app.config['MYSQL_DB'] = 'chackl'
 
 mysql = MySQL(app)
+
+@app.route('/test')
+def test():
+    find_clusters(mysql)
+    return 'works'
 
 @app.route('/')
 def home():
