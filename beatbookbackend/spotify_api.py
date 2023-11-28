@@ -40,6 +40,7 @@ def get_user_top_tracks(mysql, headers):
         username = get_user(mysql, headers)
         tracks = []
         tracks_id = []
+        print("Check 1")
         for item in data['items']:
             track_name = item['name']
             tracks.append(track_name)
@@ -59,20 +60,39 @@ def get_user_top_tracks(mysql, headers):
             tracks_id_current = [row[0] for row in cursor.fetchall()]
             cursor.execute("select Track_ID, username from User_Tracks")
             User_Tracks = cursor.fetchall()
+            cursor.execute("select Track_ID from Track_Attributes")
+            tracks_id_attr_current = [row[0] for row in cursor.fetchall()]
             Track_User = '_'.join([track_id , username])
+
+            url_attributes = 'https://api.spotify.com/v1/audio-features'
+            params_attributes = {
+                'ids' : track_id
+            }
+            data_attributes = requests.get(url=url_attributes, params=params_attributes, headers=headers).json()
+            for i in data_attributes['audio_features']:
+                acoust = i['acousticness']
+                dance = i['danceability']
+                energy = i['energy']
+                instru = i['instrumentalness']
+                loud = i['loudness']
+                tempo = i['tempo']
+                valence = i['valence']
             User_Track = []
             for x in range(len(User_Tracks)):
                  User_Track.append('_'.join(User_Tracks[x]))
-            print(Track_User)
             if Track_User not in User_Track:
                 cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" ,        
                     (track_id, username))
-            #If the Track is not in the db, add
             if track_id not in tracks_id_current:
                 cursor.execute("insert into Tracks (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity) values (%s, %s, %s, %s, %s, %s, %s, %s)",
                     (track_id, track_name, track_art_id, track_art_name, track_album_id, track_album_name, track_duration, track_popular));
+            #If the Track is not in the db, add
+            if track_id not in tracks_id_attr_current:
+                cursor.execute("insert into Track_Attributes (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity, acousticness, danceability, energy, instrumentalness, loudness, temp, valence) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (track_id, track_name, track_art_id, track_art_name, track_album_id, track_album_name, track_duration, track_popular, acoust, dance, energy, instru, loud, tempo, valence));
                 #cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" , 
                 #    (track_id, username))
+                print("hi")
                 cursor.connection.commit()
                 cursor.close() 
     
