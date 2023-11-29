@@ -98,7 +98,7 @@ const HomePage = () => {
           Login to your Spotify account and join a group of other users.
           From your personal music listening statistics, the “club” will 
           recommend an album to listen to that week that you can then rank and make comments about.
-           The groups ranking of that weeks album can then help determine future albums to recommend to you.
+           The groups ranking of that weeks album can then help determine future albums to recommend to you. HELP CLAIRE!!!
       </WelcomeMessage>
       <Link href="/topartists">
       <TopGreenButton variant="contained">
