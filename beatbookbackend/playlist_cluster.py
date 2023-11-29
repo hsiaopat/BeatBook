@@ -6,44 +6,57 @@ def find_clusters(mysql):
     # Group number is hard coded for now
     group_num = 1;
 
-    # join the tracks, user_tracks, group_#
-    #   filter for short_term tracks, only users in the group
-    #   slice the data query for only the relevant columns
-    #   standardize / categorize / normalize data
-    #   fit the model (figure out min_samples, cluster_size, and neighbor_distance)
-    #   get labels for the clusters
-    #   pull 3-5 tracks from the label and call spotify recommendations endpoint
-
     # Join tables to get track features from the database for users in the specified group
     cursor = mysql.connection.cursor()
-    cursor.execute("select Group_%s.Member_name, Tracks.track_name, Tracks.popularity \
-                    from Tracks, User_Tracks, Group_%s \
-                    where Tracks.track_id = User_Tracks.track_id and \
+    cursor.execute("select Group_%s.Member_name, Track_Attributes.track_name, \
+                        Track_Attributes.popularity, Track_Attributes.acousticness, Track_Attributes.danceability, \
+                        Track_Attributes.energy, Track_Attributes.instrumentalness, Track_Attributes.loudness, \
+                        Track_Attributes.temp, Track_Attributes.valence \
+                    from Track_Attributes, User_Tracks, Group_%s \
+                    where Track_Attributes.track_id = User_Tracks.track_id and \
                           User_Tracks.username = Group_%s.Member_username", (group_num, group_num, group_num))
     #                      and Tracks.time = 'short_term'")  
     df = DataFrame(cursor.fetchall())
     cursor.close()
+
+    # Make a data frame for the track attributes and one for the track and member names
+    df.columns = ['Member', 'Track', 'Popularity', 'Acousticness', 'Danceability', 'Energy', 'Instrumentalness', 'Loudness', 'Tempo', 'Valence']
+    tracks = df[['Member', 'Track']]
+    attrs = df[['Popularity', 'Acousticness', 'Danceability', 'Energy', 'Instrumentalness', 'Loudness', 'Tempo', 'Valence']]
     
-    print(df)
-    normalize(df)
-    print(df)
+    # Normalize and cluster
+    normalize(attrs)
+    cluster = OPTICS(min_samples=3, xi=0.03)
+    cluster.fit(attrs)
 
-    #cluster = OPTICS(min_samples=20, xi=0.05, min_cluster_size=0.05)
-    #cluster.fit(df)
+    # Find the labels
+    labels = cluster.labels_
+    print("labels: ", labels, "len: ", len(labels))
+    
+    # Print data points for each cluster
+    unique_labels = np.unique(labels)
+    for label in unique_labels:
+        cluster_points = attrs[labels == label].index
+        print(f"Data points in Cluster {label}:")
 
-    #labels = clustering.labels_
-    #print("labels: ", labels)
+        # Print out each track in the cluster
+        for ind in cluster_points:
+            print(tracks.at[ind, 'Track'])
 
-def normalize(data):
-    tup_pop = 2
+        print()
 
-    for row in data:
-        print(row)
+def normalize(df):
+    # Update popularity column to be a float value and normalize between 0 and 1
+    df['Popularity'] = df['Popularity'].astype(float)
+    df['Popularity'] = df['Popularity'] / 100.0
 
-        # Popularity
-        #tup[tup_pop] = float(tup[tup_pop]) / 100.0
+    # Normalize loudness column
+    df['Loudness'] = (df['Loudness'] - df['Loudness'].min()) / (df['Loudness'].max() - df['Loudness'].min())
 
-        # 
+    # Normalize tempo column
+    df['Tempo'] = (df['Tempo'] - df['Tempo'].min()) / (df['Tempo'].max() - df['Tempo'].min())
+
 
 if __name__ == '__main__':
     pass
+    
