@@ -1,6 +1,6 @@
 # File for groups
+from spotify_api import get_user
 
-NOT IMPLEMENTED YET OR TESTED
 def join_group(mysql, headers, group_identifier):
     cursor = mysql.connection.cursor()
     username = get_user(mysql, headers)

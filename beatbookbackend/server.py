@@ -6,7 +6,7 @@ from spotify_api import *
 from flask import jsonify  
 from flask_cors import CORS
 import logging
-
+from groups import *
 from playlist_cluster import *
 
 # Create a new flask instance
@@ -44,7 +44,7 @@ def home():
         # Get the username from get_user spotify API call
         username = get_user(mysql, headers)
         tracks, tracks_id = get_user_top_tracks(mysql, headers)
-        artists,artists_id = get_user_top_artists(mysql,headers)
+        artists,artists_id = get_all_user_top_artists(mysql,headers)
         #get_user_stats(mysql,headers)
         # Select from the database to get the user display_name
         cursor = mysql.connection.cursor()
@@ -95,7 +95,7 @@ def top_artists():
         username = get_user(mysql, headers)
 
         # Get the user's top tracks
-        artists, artists_id = get_user_top_artists(mysql, headers)
+        artists, artists_id = get_all_user_top_artists(mysql, headers)
         print(artists)
         # Render a template or return the data in JSON format
         return jsonify({'artists': artists, 'artists_id': artists_id})
