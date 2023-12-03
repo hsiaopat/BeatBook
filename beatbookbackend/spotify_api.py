@@ -200,3 +200,19 @@ def get_user_stats(mysql, headers):
         cursor.connection.commit()
         cursor.close()
 
+def get_recommendations(mysql, headers, tracks):
+    url = 'https://api.spotify.com/v1/recommendations'
+
+    playlist = []
+    for group in tracks:
+        print(','.join(group))
+        params = {
+            'seed_tracks': ','.join(group),
+            'limit': 2  
+        }
+
+        data = requests.get(url=url, params=params, headers=headers).json()
+        for item in data['tracks']:
+            playlist.append(item['name'])
+        #pprint.pprint(data)
+    print(playlist)
