@@ -33,7 +33,8 @@ mysql = MySQL(app)
 
 @app.route('/test')
 def test():
-    find_clusters(mysql)
+    tracks = find_clusters(mysql)
+    get_recommendations(mysql, headers, tracks)
     return 'works'
 
 @app.route('/')
