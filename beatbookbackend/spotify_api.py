@@ -200,3 +200,43 @@ def get_user_stats(mysql, headers):
         cursor.connection.commit()
         cursor.close()
 
+# Get recommendations based on a list of lists of tracks within clusters
+def get_recommendations(headers, tracks):
+    # Spotify API endpoint
+    url = 'https://api.spotify.com/v1/recommendations'
+
+    # Request data from Spotify endpoint
+    playlist = []
+    for group in tracks:
+        params = {
+            'seed_tracks': ','.join(group),
+            'limit': 2  
+        }
+
+        data = requests.get(url=url, params=params, headers=headers).json()
+        for item in data['tracks']:
+            playlist.append(item['uri'])
+    
+    # Return list of track uris to be in the playlist
+    return playlist
+
+# Create recommendation playlist
+def create_rec_playlist(mysql, headers, playlist):
+    # Create a new playlist
+    user_id = get_user(mysql, headers)
+    url = f'https://api.spotify.com/v1/users/{user_id}/playlists'
+    params = {
+        'name': 'BeatBook Recommendations'
+    }
+    headers['content-type'] = 'application/json'
+    data = requests.post(url=url, json=params, headers=headers).json()
+    
+    # Add the recommended tracks to the playlist
+    playlist_id = data['id']
+    url = f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks'
+    params = {
+        'uris': playlist
+    }
+    data = requests.post(url=url, json=params, headers=headers).json()
+
+

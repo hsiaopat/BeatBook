@@ -31,9 +31,12 @@ app.config['MYSQL_DB'] = 'chackl'
 
 mysql = MySQL(app)
 
+# Temporary endpoint to test clustering algorithm
 @app.route('/test')
 def test():
-    find_clusters(mysql)
+    tracks = find_clusters(mysql)
+    tracks = get_recommendations(headers, tracks)
+    create_rec_playlist(mysql, headers, tracks)
     return 'works'
 
 @app.route('/')
