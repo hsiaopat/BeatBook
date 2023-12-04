@@ -4,6 +4,8 @@ import axios from 'axios';
 import { Dialog, Transition } from '@headlessui/react';
 import '../globals.css';
 import { styled } from '@mui/system';
+import Link from 'next/link';
+
 
 const Container = styled('div')({
   display: 'flex',
@@ -132,7 +134,7 @@ const GroupsGallery: React.FC = () => {
        <>
          <nav className="bg-white border-gray-200 dark:bg-gray-900">
            <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
-             <a href="https://spotify.com" className="flex items-center space-x-3 rtl:space-x-reverse">
+             <a href="/home" className="flex items-center space-x-3 rtl:space-x-reverse">
                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">BeatBook</span>
              </a>
              <div className="flex items-center space-x-6 rtl:space-x-reverse">
@@ -162,21 +164,24 @@ const GroupsGallery: React.FC = () => {
         </div>
         <div className="flex items-center justify-center mb-4">
         <button
-          className="block mx-auto bg-green-500 text-black p-2 rounded hover:bg-green-600 focus:outline-none"
+          className="block mx-auto bg-blue-600 text-black p-2 rounded hover:bg-green-600 focus:outline-none"
           onClick={() => setCreateGroupModalOpen(true)}
         >
           Create Group
         </button>
 </div>
 
-       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-       {groups.map((group) => (
-        <div key={group.group_id} className="bg-white p-4 border border-gray-300 rounded">
-        <p className="text-lg font-bold">{'{group.group_name} - Members: ${group.num_members}'} </p>
-      </div>
-              ))}
-
-       </div>
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+      {groups.map((group) => (
+        <Link key={group.group_id} href={`/group/${group.group_id}`}>
+          <a>
+            <div className="bg-white p-4 border border-gray-300 rounded cursor-pointer hover:shadow-lg transition-transform duration-300 transform hover:scale-105">
+              <p className="text-lg font-bold">{`${group.group_name} - Members: ${group.num_members}`}</p>
+            </div>
+          </a>
+        </Link>
+      ))}
+    </div>
      </div>
 
 

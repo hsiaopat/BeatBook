@@ -175,6 +175,18 @@ def display_groups_route():
     # Render a template or return the data in JSON format
     return jsonify({'groups': groups})
 
+@app.route('/group/<int:group_id>')
+def display_group_info_route(group_id):
+    global headers
+    if 'Authorization' not in headers:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    # Call your display_groups function here with the specific group_id
+    group = display_group_info(mysql, headers, group_id)
+
+    # Render a template or return the data in JSON format
+    return jsonify({'group': group})
+
 
 if __name__ == '__main__':
     # make changes in real time
