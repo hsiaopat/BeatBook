@@ -33,29 +33,20 @@ def find_clusters(mysql):
     # Find the labels
     labels = cluster.labels_
     
-    # Print data points for each cluster
+    # Sort the clusters based on number of points
     clusters = [attrs[labels==label].index.tolist() for label in np.unique(labels) if label != -1]
     sort_clusters = sorted(clusters, key=len, reverse=True)[:5]
-    print(sort_clusters)
 
+    # Get the track_id of the tracks for eah cluster
     cluster_tracks = []
     for c in sort_clusters:
         c = [tracks.at[ind, 'Track_id'] for ind in c]
+        
+        # Pick 5 random tracks from the cluster
         cluster_tracks.append(random.sample(c, k=5))
+
     return cluster_tracks
 
-    '''
-    unique_labels = np.unique(labels)
-    for label in unique_labels:
-        cluster_points = attrs[labels == label].index
-        print(f"Data points in Cluster {label}:")
-
-        # Print out each track in the cluster
-        for ind in cluster_points:
-            print(tracks.at[ind, 'Track'])
-
-        print()
-    '''
 
 def normalize(df):
     # Update popularity column to be a float value and normalize between 0 and 1
