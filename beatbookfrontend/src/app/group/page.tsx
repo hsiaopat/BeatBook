@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import * as d3 from 'd3'; 
 
 
 
@@ -14,7 +15,7 @@ interface GroupData {
   features: number[];
   feature_diff: number[];
   shared_artists: { 'Artist Name': string }[];
-  artists_pie: { 'Artist Name': string; 'Percent Top Songs': number }[];
+  artists_pie: { 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }[];
   unique_tracks: { 'Track Name': string; 'Artist Name': string; 'Album Name': string }[];
   // Add more properties as needed
 }
@@ -52,6 +53,60 @@ const GroupPage: React.FC = () => {
   }
 };
 
+const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }[]) => {
+  const width = 800;
+  const height = 400;
+  const radius = Math.min(width, height) / 2;
+
+  // Create an svg element for the pie chart and key
+  const svg = d3.select('#pieChart').append('svg').attr('width', width).attr('height', height);
+
+  // Create a group for the pie chart
+  const pieGroup = svg.append('g').attr('transform', `translate(${width / 3},${height / 2})`);
+
+  // Create a pie chart
+  const pie = d3.pie<{ 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }>().value((d) => d['Percent Top Songs']);
+  const data_ready = pie(data) as Array<d3.PieArcDatum<{ 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }>>;
+
+  // Create arcs
+  const arc = d3.arc<d3.PieArcDatum<{ 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }>>().innerRadius(0).outerRadius(radius);
+
+  // Add slices to the pie chart
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  pieGroup
+    .selectAll('slices')
+    .data(data_ready)
+    .enter()
+    .append('path')
+    .attr('d', arc)
+    .attr('fill', (d) => color(d.data['Artist Name']));
+
+  // Create a group for the key
+  const keyGroup = svg.append('g').attr('transform', `translate(${width / 1.5},${height / 4})`);
+
+  // Add key entries
+  const keyEntries = keyGroup
+    .selectAll('keyEntries')
+    .data(data_ready)
+    .enter()
+    .append('g')
+    .attr('transform', (d, i) => `translate(0,${i * 20})`);
+
+  keyEntries
+    .append('rect')
+    .attr('width', 15)
+    .attr('height', 15)
+    .attr('fill', (d) => color(d.data['Artist Name']));
+
+  keyEntries
+    .append('text')
+    .text((d) => `${d.data['Artist Name']} (${d.data['Percent Top Songs']}%)`)
+    .attr('x', 20)
+    .attr('y', 10)
+    .style('font-size', '12px')
+    .style('fill', 'black');
+};
+
 
  useEffect(() => {
    const fetchGroupDetails = async () => {
@@ -82,6 +137,14 @@ const GroupPage: React.FC = () => {
    // Fetch group details when the component mounts or when the dynamic route parameters change
    fetchGroupDetails();
  }, [searchParams]); // Dependency on the searchParams
+
+ useEffect(() => {
+  // Check if group data is available and artists_pie is present
+  if (group && group.artists_pie) {
+    // Create a pie chart
+    createPieChart(group.artists_pie);
+  }
+}, [group]);
 
 
  if (loading) {
@@ -115,88 +178,34 @@ const GroupPage: React.FC = () => {
     {/* Make Cluster recommendation playlist*/}
 
 
-
-    <div data-hs-carousel='{"loadingClasses": "opacity-0","isAutoPlay": true}' className="relative">
-      <div className="hs-carousel relative overflow-hidden w-full min-h-[350px] bg-white rounded-lg">
-        <div className="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
-          <div className="hs-carousel-slide">
-            <div className="flex flex-col justify-center h-full bg-gray-100 p-6">
-              <p className = "text-sm text-black-600">Features: {JSON.stringify(group.features)}</p>
-            </div>
-          </div>
-          <div className="hs-carousel-slide">
-            <div className="flex flex-col justify-center h-full bg-gray-200 p-6">
-              <p>Feature Diff: {JSON.stringify(group.feature_diff)}</p>
-            </div>
-          </div>
-          <div className="hs-carousel-slide">
-            <div className="flex flex-col justify-center h-full bg-gray-300 p-6">
-              <p>Shared Artists: {JSON.stringify(group.shared_artists)}</p>
-            </div>
-          </div>
-          <div className="hs-carousel-slide">
-            <div className="flex flex-col justify-center h-full bg-gray-400 p-6">
-              <p>Artists Pie: {JSON.stringify(group.artists_pie)}</p>
-            </div>
-          </div>
-          <div className="hs-carousel-slide">
-            <div className="flex flex-col justify-center h-full bg-gray-500 p-6">
-              <p>Unique Tracks: {JSON.stringify(group.unique_tracks)}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        className="hs-carousel-prev hs-carousel:disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 start-0 inline-flex justify-center items-center w-[46px] h-full text-gray-800 hover:bg-gray-800/[.1]"
-      >
-        <span className="text-2xl" aria-hidden="true">
-          <svg
-            className="w-4 h-4"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-          </svg>
-        </span>
-        <span className="sr-only">Previous</span>
-      </button>
-      <button
-        type="button"
-        className="hs-carousel-next hs-carousel:disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 end-0 inline-flex justify-center items-center w-[46px] h-full text-gray-800 hover:bg-gray-800/[.1]"
-      >
-        <span className="sr-only">Next</span>
-        <span className="text-2xl" aria-hidden="true">
-          <svg
-            className="w-4 h-4"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
-          </svg>
-        </span>
-      </button>
-
-      <div className="hs-carousel-pagination flex justify-center absolute bottom-3 start-0 end-0 space-x-2">
-      <span className="hs-carousel-active:bg-blue-700 hs-carousel-active:border-blue-700 w-3 h-3 border border-gray-400 rounded-full cursor-pointer"></span>
-        <span className="hs-carousel-active:bg-blue-700 hs-carousel-active:border-blue-700 w-3 h-3 border border-gray-400 rounded-full cursor-pointer"></span>
-        <span className="hs-carousel-active:bg-blue-700 hs-carousel-active:border-blue-700 w-3 h-3 border border-gray-400 rounded-full cursor-pointer"></span>
-      </div>
-    </div>
-
+    {/* Artist Pie */}
+    <div className="mx-auto" id="pieChart" style={{ margin: '20px auto' }}></div>
      {/* Add more details about the group as needed */}
+    {/*Shared Artists*/}
+     <div className="mt-8">
+        <h2 className="text-3xl font-bold mb-4">Shared Artists</h2>
+        <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {group.shared_artists.map((artist) => (
+            <li key={artist['Artist Name']} className="bg-blue-100 p-4 rounded-md">
+              {artist['Artist Name']}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Unique Tracks Section */}
+      <div className="mt-8">
+        <h2 className="text-3xl font-bold mb-4">Unique Tracks</h2>
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {group.unique_tracks.map((track, index) => (
+            <li key={index} className="bg-green-100 p-4 rounded-md">
+              <strong>{track['Track Name']}</strong> - {track['Artist Name']} - {track['Album Name']}
+            </li>
+          ))}
+        </ul>
+      </div>
       <p>Features: {JSON.stringify(group.features)}</p>
       <p>Feature Diff: {JSON.stringify(group.feature_diff)}</p>
-      <p>Shared Artists: {JSON.stringify(group.shared_artists)}</p>
-      <p>Artists Pie: {JSON.stringify(group.artists_pie)}</p>
-      <p>Unique Tracks: {JSON.stringify(group.unique_tracks)}</p>
 
       <div className="flex justify-between items-center">
       {/* Container 1 */}
