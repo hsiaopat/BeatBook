@@ -20,7 +20,7 @@ const TopArtistsPage = () => {
    useEffect(() => {
 
 
-       const fetchTopTracks = async () => {
+       const fetchTopArtists = async () => {
            try {
                const response = await axios.get('http://129.74.153.235:5028/topartists');
                console.log('Full Response:', response.data);
@@ -31,7 +31,7 @@ const TopArtistsPage = () => {
        };
 
 
-       fetchTopTracks();
+       fetchTopArtists();
    }, []); // Empty dependency array ensures the effect runs only once on mount
 
 
@@ -67,7 +67,8 @@ const TopArtistsPage = () => {
      <span className="mr-3 text-blue-500 dark:text-blue-400">
        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
          className={`w-6 h-6 text-blue-500 dark:text-blue-400 bi bi-${index + 1}-circle-fill`} viewBox="0 0 16 16">
-         {/* Path content */}
+         {/* Path content */ }
+
        </svg>
      </span>
      {artist}
