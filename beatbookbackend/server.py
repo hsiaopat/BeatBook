@@ -8,6 +8,7 @@ from flask_cors import CORS
 import logging
 from groups import *
 from playlist_cluster import *
+from wrapped import *
 
 # Create a new flask instance
 app = Flask(__name__)
@@ -34,9 +35,17 @@ mysql = MySQL(app)
 # Temporary endpoint to test clustering algorithm
 @app.route('/test')
 def test():
-    tracks = find_clusters(mysql)
+    tracks = find_clusters(mysql, 1)
     tracks = get_recommendations(headers, tracks)
     create_rec_playlist(mysql, headers, tracks)
+    
+    username='m2ji3ahws37nw58fkyo9sj294'
+    #get_user_feature_values(mysql, username)
+    #get_user_feature_diff(mysql, 1, username)
+    #shared_top_artists(mysql, 1)
+    #artists_pie(mysql, 1)
+    unique_tracks(mysql, 1, username)
+
     return 'works'
 
 @app.route('/')

@@ -3,10 +3,7 @@ import numpy as np
 import random
 from pandas import DataFrame
 
-def find_clusters(mysql):
-    # Group number is hard coded for now
-    group_num = 1;
-
+def find_clusters(mysql, group_num):
     # Join tables to get track features from the database for users in the specified group
     cursor = mysql.connection.cursor()
     cursor.execute("select Group_%s.Member_name, Track_Attributes.track_name, Track_Attributes.track_id, \
