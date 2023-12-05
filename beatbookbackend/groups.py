@@ -162,6 +162,14 @@ def get_group_members(mysql, group_id):
     cursor.close()
     return members
 
+def get_group_display_names(mysql, group_id):
+    cursor = mysql.connection.cursor()
+    command = f"SELECT Member_name FROM Group_{group_id}"
+    cursor.execute(command)
+    members = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    return members
+
 def display_group_info(mysql, headers, group_id):
     cursor = mysql.connection.cursor()
     # Use a parameterized query to fetch information for the specific group_id
