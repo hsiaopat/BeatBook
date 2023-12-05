@@ -249,20 +249,23 @@ def display_group_info_route(group_id):
 
    # Call your display_groups function here with the specific group_id
    group = display_group_info(mysql, headers, group_id)
+   print(group)
    features = get_user_feature_values(mysql, username)
    feature_diff = get_user_feature_diff(mysql, group_id, username)
    shared_artists = shared_top_artists(mysql, group_id)
+   shared_tracks_data = shared_top_tracks(mysql, group_id)
    artist_pie = artists_pie(mysql, group_id)
-   unique_tracks_data = unique_tracks(mysql, 1, username)
+   members = get_group_display_names(mysql, group_id)
    group_dict = {
        'group_id': group[0],
        'group_name': group[1],
        'num_members': group[2],
+       'group_members': members,
        'features': features[1:],
        'feature_diff': feature_diff,
        'shared_artists': shared_artists.to_dict(orient='records'),  # Convert DataFrame to a list of dictionaries
        'artists_pie': artist_pie.to_dict(orient='records'),
-       'unique_tracks': unique_tracks_data.to_dict(orient='records'),
+       'shared_tracks':shared_tracks_data.to_dict(orient='records'),
    }
    print(group)
    print(group_dict)
