@@ -16,7 +16,14 @@ def get_user_feature_values(mysql, username):
                     where User_Tracks.Track_ID = Track_Attributes.Track_ID and \
                           User_Tracks.username = %s \
                     group by User_Tracks.username", (username,))
+    
+    result = []
+    if result is None:
+        # Return a default value or handle the case when no data is found
+        cursor.close()
+        return []
     result = list(cursor.fetchone())
+    
     result = [float(value) if isinstance(value, Decimal) else value for value in result]
 
     cursor.close()
