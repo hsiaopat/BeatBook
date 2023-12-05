@@ -161,3 +161,13 @@ def get_group_members(mysql, group_id):
     members = [row[0] for row in cursor.fetchall()]
     cursor.close()
     return members
+
+def display_group_info(mysql, headers, group_id):
+    cursor = mysql.connection.cursor()
+    # Use a parameterized query to fetch information for the specific group_id
+    command = "SELECT group_id, group_name, num_members FROM Clubs WHERE group_id = %s"
+    cursor.execute(command, (group_id,))
+    group = cursor.fetchone()
+    cursor.connection.commit()
+    cursor.close()
+    return group
