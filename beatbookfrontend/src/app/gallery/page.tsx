@@ -172,16 +172,16 @@ const GroupsGallery: React.FC = () => {
 </div>
 
 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-      {groups.map((group) => (
-        <Link key={group.group_id} href={`/group/${group.group_id}`}>
-          <a>
-            <div className="bg-white p-4 border border-gray-300 rounded cursor-pointer hover:shadow-lg transition-transform duration-300 transform hover:scale-105">
-              <p className="text-lg font-bold">{`${group.group_name} - Members: ${group.num_members}`}</p>
-            </div>
-          </a>
-        </Link>
-      ))}
-    </div>
+        {groups.map((group) => (
+          <Link key={group.group_id} href={`/group?group_id=${group.group_id}`}>
+            <a>
+              <div className="bg-white p-4 border border-gray-300 rounded cursor-pointer hover:shadow-lg transition-transform duration-300 transform hover:scale-105">
+                <p className="text-lg font-bold">{`${group.group_name} - Members: ${group.num_members}`}</p>
+              </div>
+            </a>
+          </Link>
+        ))}
+      </div>
      </div>
 
 

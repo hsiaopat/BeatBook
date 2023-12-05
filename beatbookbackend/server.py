@@ -17,7 +17,8 @@ CORS(app, resources={r"/toptracks": {"origins": "*"},
                      r"/joingroup": {"origins": "*"},
                      r"/creategroup": {"origins": "*"},
                      r"/leavegroup": {"origins": "*"},
-                     r"/displaygroups": {"origin": "*"}})
+                     r"/displaygroups": {"origin": "*"},
+                     r"/group/*": {"origins": "*"}})
 
 # Global headers variable
 headers = {}
@@ -183,9 +184,16 @@ def display_group_info_route(group_id):
 
     # Call your display_groups function here with the specific group_id
     group = display_group_info(mysql, headers, group_id)
-
+    group_dict = {
+        'group_id': group[0],
+        'group_name': group[1],
+        'num_members': group[2]
+        # Add more properties as needed
+    }
+    print(group)
+    print(group_dict)
     # Render a template or return the data in JSON format
-    return jsonify({'group': group})
+    return jsonify({'group': group_dict})
 
 
 if __name__ == '__main__':
