@@ -12,11 +12,12 @@ interface GroupData {
   group_id: string;
   group_name: string;
   num_members: number;
+  group_members: string[];
   features: number[];
   feature_diff: number[];
   shared_artists: { 'Artist Name': string }[];
   artists_pie: { 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }[];
-  unique_tracks: { 'Track Name': string; 'Artist Name': string; 'Album Name': string }[];
+  shared_tracks: { 'Track Name': string; 'Artist Name': string; 'Album Name': string }[];
   // Add more properties as needed
 }
 
@@ -170,16 +171,48 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
             </div>
           </div>
         </nav>
-     <h1>Group ID: {group.group_id}</h1>
-     <p>Group Name: {group.group_name}</p>
-     <p>Members: {group.num_members}</p>
-     <p>hello</p>
+
+        <div className="bg-white p-8 rounded-md shadow-md">
+  <h1 className="text-2xl font-bold mb-4">Group ID: {group.group_id}</h1>
+  <p className="text-lg">Group Name: {group.group_name}</p>
+
+  <div className="mt-6">
+    <h2 className="text-3xl font-bold mb-4">Group Members</h2>
+    <ul className="list-disc pl-6">
+      {group.group_members.map((member, index) => (
+        <li key={index} className="mb-2">{member}</li>
+      ))}
+    </ul>
+  </div>
+  </div>
+
+  <div className="sm:flex items-center justify-center max-w-screen-xl h-screen">
+  <div className="sm:w-1/2 p-5 text-center">
+    <div className="text">
+      <span className="text-gray-500 border-b-2 border-blue-600 uppercase">What is this?</span>
+      <h2 className="my-4 font-bold text-3xl sm:text-4xl">About <span className="text-blue-600">Dorm Party/Wrapped</span></h2>
+      <p className="text-gray-700">
+        Take a sneak peek into Dorm Party and Dorm Wrapped! Click the button below to view your dorm party in your own Spotify library! We used a clustering algorithm to find songs perfectly catered to you and your friends! 
+        Scroll down to look at your group stats and see your Dorm Wrapped!
+      </p>
+    </div>
+  </div>
+</div>
+
+    
+
+        
+        
 
     {/* Make Cluster recommendation playlist*/}
 
+  <h2 className="my-4 font-bold text-4xl sm:text-4xl">Dorm Wrapped</h2>
 
     {/* Artist Pie */}
-    <div className="mx-auto" id="pieChart" style={{ margin: '20px auto' }}></div>
+    <h2 className="text-3xl font-bold mb-4">Artist Listening Distribution</h2>
+    <div className="mt-8">
+    <div className="text-3xl font-bold mb-4 mx-auto" id="pieChart" style={{ margin: '20px auto' }}></div>
+    </div>
      {/* Add more details about the group as needed */}
     {/*Shared Artists*/}
      <div className="mt-8">
@@ -195,9 +228,9 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
 
       {/* Unique Tracks Section */}
       <div className="mt-8">
-        <h2 className="text-3xl font-bold mb-4">Unique Tracks</h2>
+        <h2 className="text-3xl font-bold mb-4">Shared Tracks</h2>
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {group.unique_tracks.map((track, index) => (
+          {group.shared_tracks.map((track, index) => (
             <li key={index} className="bg-green-100 p-4 rounded-md">
               <strong>{track['Track Name']}</strong> - {track['Artist Name']} - {track['Album Name']}
             </li>

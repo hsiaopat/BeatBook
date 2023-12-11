@@ -20,7 +20,7 @@ const TopArtistsPage = () => {
    useEffect(() => {
 
 
-       const fetchTopTracks = async () => {
+       const fetchTopArtists = async () => {
            try {
                const response = await axios.get('http://129.74.153.235:5028/topartists');
                console.log('Full Response:', response.data);
@@ -31,7 +31,7 @@ const TopArtistsPage = () => {
        };
 
 
-       fetchTopTracks();
+       fetchTopArtists();
    }, []); // Empty dependency array ensures the effect runs only once on mount
 
 
@@ -52,22 +52,21 @@ const TopArtistsPage = () => {
 
 
         <div className="w-full px-4 mb-10 xl:w-1/2 lg:mb-8">
-   <span className="text-sm font-semibold text-blue-500 dark:text-blue-400">Why choose us</span>
+   <span className="text-sm font-semibold text-blue-500 dark:text-blue-400"></span>
    <h2 className="mt-2 mb-4 text-2xl font-bold text-gray-700 dark:text-gray-300">
-       We are providing a better facility
+       Your Top Artists
    </h2>
    <p className="mb-4 text-base leading-7 text-gray-500 dark:text-gray-400">
-       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-       incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+   Take a look at your top 50 artists from the last 30 days. Tune In!
    </p>
-           <h1>Top Artists</h1>
            <ul className="mb-10">
  {topArtists.map((artist, index) => (
    <li key={index} className="flex items-center mb-4 text-base text-gray-600 dark:text-gray-400">
      <span className="mr-3 text-blue-500 dark:text-blue-400">
        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
          className={`w-6 h-6 text-blue-500 dark:text-blue-400 bi bi-${index + 1}-circle-fill`} viewBox="0 0 16 16">
-         {/* Path content */}
+         {/* Path content */ }
+
        </svg>
      </span>
      {artist}
