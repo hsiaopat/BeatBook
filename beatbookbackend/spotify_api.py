@@ -66,7 +66,7 @@ def get_user_short_term_top_tracks(mysql, headers):
     cursor = mysql.connection.cursor()
     cursor.execute("select Track_name from (select Track_name, input_order from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 50) as T order by input_order;" % username)
     tracks = [row[0] for row in cursor.fetchall()]
-    cursor.execute("select Tracks.Track_ID from (select Tracks.Track_ID, input_order from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 50) as T order by input_order;" % username)
+    cursor.execute("select Track_ID from (select Tracks.Track_ID, input_order from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 50) as T order by input_order;" % username)
     track_ids = [row[0] for row in cursor.fetchall()]
     cursor.connection.commit()
     cursor.close
@@ -77,7 +77,7 @@ def get_user_short_term_top_artists(mysql, headers):
     cursor = mysql.connection.cursor()
     cursor.execute("select Artist_name from (select Artist_name, input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order;" % username)
     artists = [row[0] for row in cursor.fetchall()]
-    cursor.execute("select Artist_name from (select Artist.Artist_ID,input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order" % username)
+    cursor.execute("select Artist_ID from (select Artist.Artist_ID,input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order" % username)
     artist_ids = [row[0] for row in cursor.fetchall()]
     cursor.connection.commit()
     cursor.close
