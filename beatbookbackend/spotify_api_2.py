@@ -1,6 +1,8 @@
 import requests
 import pprint
+from pandas import DataFrame
 from collections import Counter
+from datetime import date
 def get_user(mysql, headers):
     # Request user's profile from the spotify API
     r = requests.get(url='https://api.spotify.com/v1/me', headers=headers)
@@ -24,9 +26,52 @@ def get_user(mysql, headers):
 
     return username
 
+def add_links(mysql, headers):
+    cursor = mysql.connection.cursor()
+    cursor.execute("select Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity, acousticness, danceability, energy, instrumentalness, loudness, temp, valence from Track_Attributes")
+    df = DataFrame(cursor.fetchall(), columns = ['Track_ID', 'Track_name', 'Artist_ID', 'Artist_name', 'Album_ID', 'Album_name', 'duration', 'popularity', 'acousticness', 'danceability', 'energy', 'instrumentalness', 'loudness', 'temp','valence'])
+    for index, item in df.iterrows():
+        url = 'https://api.spotify.com/v1/tracks/%s' % item['Track_ID']
+        params = {
+            
+        }
+        data = requests.get(url=url, params = params, headers=headers).json()
+        artist_link = ""
+        album_link = ""
+        try:
+            data['album']['images']
+            album_link = (data['album']['images'][0]['url'])
+        except:
+            album_link = ""
+        try:
+            data['artists']['images']
+            artist_link = (data['artists']['images'][0]['url'])
+        except:
+             artist_link = ""
+        print(item['Album_name'])
+        cursor.execute('select Track_ID from Track_Attributes_All')
+        Track_Attributes_All = [row[0] for row in cursor.fetchall()]
+        if item["Track_ID"] not in Track_Attributes_All:
+             cursor.execute("insert into Track_Attributes_All (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity, acousticness, danceability, energy, instrumentalness, loudness, temp, valence, Artist_link, Album_link) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                   (item['Track_ID'], item['Track_name'], item['Artist_ID'], item['Artist_name'], item['Album_ID'], 
+                    item['Album_name'], item['duration'], item['popularity'], item['acousticness'], item['danceability'], item['energy'], 
+                    item['instrumentalness'], item['loudness'], item['temp'], item['valence'], artist_link, album_link))
+             cursor.connection.commit()
 
+    cursor.close()
+    print('Done')
 
-
+def get_user_short_term_top_tracks(mysql, headers):
+    username = get_user(mysql, headers)
+    cursor = mysql.connection.cursor()
+    cursor.execute("select Track_name from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 25" % username)
+    tracks = [row[0] for row in cursor.fetchall()]
+    cursor.execute("select Tracks.Track_ID from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 25" % username)
+    track_ids = [row[0] for row in cursor.fetchall()]
+    cursor.connection.commit()
+    cursor.close
+    print(tracks)
+    return tracks, track_ids
 # Get user top tracks for short, medium and long term
 def get_user_top_tracks(mysql, headers):
     times = ['short_term', 'medium_term', 'long_term']
@@ -43,7 +88,6 @@ def get_user_top_tracks(mysql, headers):
         username = get_user(mysql, headers)
         tracks = []
         tracks_id = []
-        print("Check 1")
         for item in data['items']:
             track_name = item['name']
             tracks.append(track_name)
@@ -55,23 +99,36 @@ def get_user_top_tracks(mysql, headers):
                 break
             track_album_id = item['album']['id']
             track_album_name =item['album']['name']
+            try:
+                item['album']['images']
+                album_link = (item['album']['images'][0]['url'])
+            except:
+                album_link = ""
+            try:
+                item['artists']['images']
+                artist_link = (item['artists']['images'][0]['url'])
+            except:
+                artist_link = ""
             track_duration = item['duration_ms']
             track_popular = item['popularity']
             #Select the Track Id from the database
             cursor = mysql.connection.cursor()
             cursor.execute("select Track_ID from Tracks");
             tracks_id_current = [row[0] for row in cursor.fetchall()]
-            cursor.execute("select Track_ID, username from User_Tracks")
+            cursor.execute("select Track_ID, username from User_Tracks_All")
             User_Tracks = cursor.fetchall()
+            cursor.execute("select date from User_Tracks_All")
+            User_Tracks_Date = [row[0] for row in cursor.fetchall()]
             cursor.execute("select Track_ID from Track_Attributes")
             tracks_id_attr_current = [row[0] for row in cursor.fetchall()]
-            Track_User = '_'.join([track_id , username])
+            Track_User = '_'.join([track_id , username, str(date.today())])
 
             url_attributes = 'https://api.spotify.com/v1/audio-features'
             params_attributes = {
                 'ids' : track_id
             }
             data_attributes = requests.get(url=url_attributes, params=params_attributes, headers=headers).json()
+            print(track_id)
             for i in data_attributes['audio_features']:
                 acoust = i['acousticness']
                 dance = i['danceability']
@@ -82,22 +139,24 @@ def get_user_top_tracks(mysql, headers):
                 valence = i['valence']
             User_Track = []
             for x in range(len(User_Tracks)):
-                 User_Track.append('_'.join(User_Tracks[x]))
+                 T = '_'.join([('_'.join(User_Tracks[x])), str(User_Tracks_Date[x])])
+                 User_Track.append(T)
             if Track_User not in User_Track:
-                cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" ,        
-                    (track_id, username))
+                cursor.execute("insert into User_Tracks_All (Track_ID, username, type, date) values (%s, %s, %s, %s)" ,        
+                    (track_id, username, time, date.today()))
+                cursor.connection.commit()
             if track_id not in tracks_id_current:
                 cursor.execute("insert into Tracks (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity) values (%s, %s, %s, %s, %s, %s, %s, %s)",
                     (track_id, track_name, track_art_id, track_art_name, track_album_id, track_album_name, track_duration, track_popular));
+                cursor.connection.commit()
             #If the Track is not in the db, add
             if track_id not in tracks_id_attr_current:
-                cursor.execute("insert into Track_Attributes (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity, acousticness, danceability, energy, instrumentalness, loudness, temp, valence) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    (track_id, track_name, track_art_id, track_art_name, track_album_id, track_album_name, track_duration, track_popular, acoust, dance, energy, instru, loud, tempo, valence));
+                cursor.execute("insert into Track_Attributes (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity, acousticness, danceability, energy, instrumentalness, loudness, temp, valence, Artist_link, Album_link) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (track_id, track_name, track_art_id, track_art_name, track_album_id, track_album_name, track_duration, track_popular, acoust, dance, energy, instru, loud, tempo, valence, artist_link, album_link));
                 #cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" , 
                 #    (track_id, username))
-                print("hi")
                 cursor.connection.commit()
-                cursor.close() 
+            cursor.close() 
     
 
     return tracks, tracks_id
@@ -217,19 +276,20 @@ def get_recommendations(headers, tracks):
         }
 
         data = requests.get(url=url, params=params, headers=headers).json()
+        
         for item in data['tracks']:
             playlist.append(item['uri'])
-    
+     
     # Return list of track uris to be in the playlist
     return playlist
 
 # Create recommendation playlist
-def create_rec_playlist(mysql, headers, playlist):
+def create_rec_playlist(mysql, headers, playlist, playlist_name):
     # Create a new playlist
     user_id = get_user(mysql, headers)
     url = f'https://api.spotify.com/v1/users/{user_id}/playlists'
     params = {
-        'name': 'BeatBook Recommendations'
+        'name': playlist_name
     }
     headers['content-type'] = 'application/json'
     data = requests.post(url=url, json=params, headers=headers).json()
@@ -240,6 +300,7 @@ def create_rec_playlist(mysql, headers, playlist):
     params = {
         'uris': playlist
     }
+    print(playlist_id)
     data = requests.post(url=url, json=params, headers=headers).json()
 
 
