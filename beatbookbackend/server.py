@@ -131,8 +131,8 @@ def callback():
     thr = Thread(target=thread_get_tracks)
     thr.start()
 
-    #get_user_top_tracks(mysql, headers)
-    #get_all_user_top_artists(mysql, headers)
+    thr2 = Thread(target=thread_get_artists)
+    thr2.start()
 
     return redirect('http://129.74.153.235:5029/')
 
