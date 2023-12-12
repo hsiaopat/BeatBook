@@ -72,14 +72,15 @@ def get_user_top_tracks(mysql, headers):
                 'ids' : track_id
             }
             data_attributes = requests.get(url=url_attributes, params=params_attributes, headers=headers).json()
-            for i in data_attributes['audio_features']:
-                acoust = i['acousticness']
-                dance = i['danceability']
-                energy = i['energy']
-                instru = i['instrumentalness']
-                loud = i['loudness']
-                tempo = i['tempo']
-                valence = i['valence']
+            if 'audio_features' in data_attributes:
+                for i in data_attributes['audio_features']:
+                    acoust = i['acousticness']
+                    dance = i['danceability']
+                    energy = i['energy']
+                    instru = i['instrumentalness']
+                    loud = i['loudness']
+                    tempo = i['tempo']
+                    valence = i['valence']
             User_Track = []
             for x in range(len(User_Tracks)):
                  User_Track.append('_'.join(User_Tracks[x]))

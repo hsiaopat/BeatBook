@@ -50,31 +50,29 @@ const TopTracksPage = () => {
 
 
 
-        <div className="w-full px-4 mb-10 xl:w-1/2 lg:mb-8">
-   <span className="text-sm font-semibold text-blue-500 dark:text-blue-400"></span>
-   <h2 className="mt-2 mb-4 text-2xl font-bold text-gray-700 dark:text-gray-300">
-       Your Top Tracks
-   </h2>
-   <p className="mb-4 text-base leading-7 text-gray-500 dark:text-gray-400">
+        <div className="mx-auto max-w-screen-xl flex flex-col items-center justify-center mt-4">
+  <span className="text-sm font-semibold text-black dark:text-black-400"></span>
+  <h2 className="mt-2 mb-4 text-2xl font-bold text-black dark:text-black-300">
+    Your Top Tracks
+  </h2>
+  <p className="mb-4 text-base leading-7 text-black dark:text-black-400">
     Take a look at your top 50 tracks from the last 30 days. Tune In!
-   </p>
-           <ul className="mb-10">
- {topTracks.map((track, index) => (
-   <li key={index} className="flex items-center mb-4 text-base text-gray-600 dark:text-gray-400">
-     <span className="mr-3 text-blue-500 dark:text-blue-400">
-       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-         className={`w-6 h-6 text-blue-500 dark:text-blue-400 bi bi-${index + 1}-circle-fill`} viewBox="0 0 16 16">
-         {/* Path content */ }
-
-       </svg>
-     </span>
-     {track}
-   </li>
- ))}
-</ul>
-
-
+  </p>
+  <ul className="mb-10">
+    {topTracks.map((track, index) => (
+      <li key={index} className="flex items-center mb-4 text-base text-black dark:text-black-400">
+        <span className="mr-3 text-blue-500 dark:text-blue-400">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            className={`w-6 h-6 text-blue-500 dark:text-blue-400 bi bi-${index + 1}-circle-fill`} viewBox="0 0 16 16">
+            {/* Path content */}
+          </svg>
+        </span>
+        {track}
+      </li>
+    ))}
+  </ul>
 </div>
+
 
 
        </div>
