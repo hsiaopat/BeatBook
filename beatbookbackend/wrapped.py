@@ -18,11 +18,12 @@ def get_user_feature_values(mysql, username):
                     group by User_Tracks.username", (username,))
     
     result = []
+    result = list(cursor.fetchone())
+
     if result is None:
         # Return a default value or handle the case when no data is found
         cursor.close()
         return []
-    result = list(cursor.fetchone())
     
     result = [float(value) if isinstance(value, Decimal) else value for value in result]
 
@@ -57,6 +58,9 @@ def get_user_feature_diff(mysql, group_num, username):
     group = get_group_feature_values(mysql, group_num)
     user = get_user_feature_values(mysql, username)[1:]
 
+    print(group)
+    print(user)
+
     diff = [user[i] - group[i] for i in range(len(group))]
 
     return diff
@@ -74,6 +78,12 @@ def shared_top_tracks(mysql, group_num):
                     where T.count > 1 and Tracks.Track_ID = T.Track_ID", (group_num, group_num))
 
     df = DataFrame(cursor.fetchall())
+    
+    # Check for no shared tracks
+    if len(df) == 0:
+        cursor.close()
+        return []
+
     df.columns = ['Track Name', 'Artist Name', 'Album Name']
 
     cursor.close()
@@ -93,6 +103,12 @@ def shared_top_artists(mysql, group_num):
                     where T.count > 1 and Artist.Artist_ID = T.Artist_ID", (group_num, group_num))
 
     df = DataFrame(cursor.fetchall())
+
+    # Check for no shared artists
+    if len(df) == 0:
+        cursor.close()
+        return []
+
     df.columns = ['Artist Name']
     
     cursor.close()
@@ -111,6 +127,11 @@ def artists_pie(mysql, group_num):
                     order by count desc", (group_num, group_num))
     
     df = DataFrame(cursor.fetchall())
+    
+    if len(df) == 0:
+        cursor.close()
+        return []
+
     df.columns = ['Artist Name', 'Num Songs']
     
     # Filters for artists with more than 2 songs in recent listening 

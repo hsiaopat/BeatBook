@@ -265,37 +265,42 @@ def display_groups_route():
 
 @app.route('/group/<int:group_id>')
 def display_group_info_route(group_id):
-   global headers
-   username = get_user(mysql, headers)
+    global headers
+    username = get_user(mysql, headers)
 
 
-   if 'Authorization' not in headers:
-       return jsonify({"error": "Unauthorized"}), 401
+    if 'Authorization' not in headers:
+        return jsonify({"error": "Unauthorized"}), 401
 
 
-   # Call your display_groups function here with the specific group_id
-   group = display_group_info(mysql, headers, group_id)
-   print(group)
-   features = get_user_feature_values(mysql, username)
-   feature_diff = get_user_feature_diff(mysql, group_id, username)
-   shared_artists = shared_top_artists(mysql, group_id)
-   shared_tracks_data = shared_top_tracks(mysql, group_id)
-   artist_pie = artists_pie(mysql, group_id)
-   members = get_group_display_names(mysql, group_id)
-   group_dict = {
-       'group_id': group[0],
-       'group_name': group[1],
-       'num_members': group[2],
-       'group_members': members,
-       'features': features[1:],
-       'feature_diff': feature_diff,
-       'shared_artists': shared_artists.to_dict(orient='records'),  # Convert DataFrame to a list of dictionaries
-       'artists_pie': artist_pie.to_dict(orient='records'),
-       'shared_tracks':shared_tracks_data.to_dict(orient='records'),
-   }
-   print(group)
-   print(group_dict)
-   return jsonify({'group': group_dict})
+    # Call your display_groups function here with the specific group_id
+    group = display_group_info(mysql, headers, group_id)
+    print(group)
+    features = get_user_feature_values(mysql, username)
+    feature_diff = get_user_feature_diff(mysql, group_id, username)
+    shared_artists = shared_top_artists(mysql, group_id)
+    shared_tracks_data = shared_top_tracks(mysql, group_id)
+    artist_pie = artists_pie(mysql, group_id)
+    members = get_group_display_names(mysql, group_id)
+    group_dict = {
+        'group_id': group[0],
+        'group_name': group[1],
+        'num_members': group[2],
+        'group_members': members,
+        'features': features[1:],
+        'feature_diff': feature_diff,
+        'artists_pie': artist_pie.to_dict(orient='records')
+    }
+    try:
+        group_dict['shared_artists'] = shared_artists.to_dict(orient='records')  # Convert DataFrame to a list of dictionaries
+        group_dict['shared_tracks'] = shared_tracks_data.to_dict(orient='records'),
+    except:
+        group_dict['shared_artists'] = {}
+        group_dict['shared_tracks'] = {}
+   
+    print(group)
+    print(group_dict)
+    return jsonify({'group': group_dict})
 
 @app.route('/createDormParty/<int:group_id>')
 def create_dorm_party_route(group_id):
