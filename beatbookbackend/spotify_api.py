@@ -71,9 +71,9 @@ def add_links(mysql, headers):
 def get_user_short_term_top_tracks(mysql, headers):
     username = get_user(mysql, headers)
     cursor = mysql.connection.cursor()
-    cursor.execute("select Track_name from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 25" % username)
+    cursor.execute("select Track_name from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 50" % username)
     tracks = [row[0] for row in cursor.fetchall()]
-    cursor.execute("select Tracks.Track_ID from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 25" % username)
+    cursor.execute("select Tracks.Track_ID from User_Tracks_All, Tracks where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID order by date limit 50" % username)
     track_ids = [row[0] for row in cursor.fetchall()]
     cursor.connection.commit()
     cursor.close
@@ -82,9 +82,9 @@ def get_user_short_term_top_tracks(mysql, headers):
 def get_user_short_term_top_artists(mysql, headers):
     username = get_user(mysql, headers)
     cursor = mysql.connection.cursor()
-    cursor.execute("select Artist_name from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 25" % username)
+    cursor.execute("select Artist_name from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50" % username)
     artists = [row[0] for row in cursor.fetchall()]
-    cursor.execute("select Artist.Artist_ID from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 25" % username)
+    cursor.execute("select Artist.Artist_ID from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50" % username)
     artist_ids = [row[0] for row in cursor.fetchall()]
     cursor.connection.commit()
     cursor.close
@@ -192,6 +192,10 @@ def get_user_top_tracks(mysql, headers, cursor=None):
 
 # Get user top artists data for short, medium and long term
 def get_all_user_top_artists(mysql, headers, cursor=None):
+    passed_cur = False
+    if cursor:
+        passed_cur = True
+
     times = ['short_term', 'medium_term', 'long_term']
     for time in times:
 
@@ -207,6 +211,7 @@ def get_all_user_top_artists(mysql, headers, cursor=None):
         artists_id_db = []
         artists_id = []
         username = get_user(mysql, headers, cursor)
+        count = 1
         for item in data['items']:
             artist_name = item['name']
             artists.append(artist_name)
@@ -214,7 +219,7 @@ def get_all_user_top_artists(mysql, headers, cursor=None):
             artists_id.append(artist_id)
             
             # Select the artist id from the database
-            if cursor is None:
+            if not passed_cur:
                 cursor = mysql.connection.cursor()
             cursor.execute("select Artist_ID from Artist");
             artists_id_db = [row[0] for row in cursor.fetchall()]
@@ -228,14 +233,16 @@ def get_all_user_top_artists(mysql, headers, cursor=None):
                  T = '_'.join([('_'.join(User_Artists[x])), str(User_Artists_Date[x])])
                  User_Artist.append(T)
             if Art_User not in User_Artist:
-                cursor.execute("insert into User_Artists_All (Artist_ID, username, type, date) values (%s, %s, %s, %s)" ,        
-                    (artist_id, username, time, date.today()))
+                cursor.execute("insert into User_Artists_All (Artist_ID, username, type, date, input_order) values (%s, %s, %s, %s, %s)" ,        
+                    (artist_id, username, time, date.today()), count)
             # If the artist id does not already exist, add to the database
             if artist_id not in artists_id_db:
                 cursor.execute("insert into Artist (Artist_ID, Artist_name) values (%s, %s)", 
                     (artist_id, artist_name));
+            count=count+1
             cursor.connection.commit()
-            cursor.close()
+            if not passed_cur:
+                cursor.close()
 
     return artists, artists_id
 
