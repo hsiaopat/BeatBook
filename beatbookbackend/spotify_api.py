@@ -306,12 +306,13 @@ def get_user_stats(mysql, headers):
         cursor.close()
 
 # Get recommendations based on a list of lists of tracks within clusters
-def get_recommendations(headers, tracks):
+def get_recommendations(headers, tracks, group_num):
     # Spotify API endpoint
     url = 'https://api.spotify.com/v1/recommendations'
 
     # Request data from Spotify endpoint
     playlist = []
+    t = []
     for group in tracks:
         params = {
             'seed_tracks': ','.join(group),
@@ -321,12 +322,12 @@ def get_recommendations(headers, tracks):
         data = requests.get(url=url, params=params, headers=headers).json()
         for item in data['tracks']:
             playlist.append(item['uri'])
-    
+            t.append(item['id'])
     # Return list of track uris to be in the playlist
-    return playlist
+    return playlist,t
 
 # Create recommendation playlist
-def create_rec_playlist(mysql, headers, playlist):
+def create_rec_playlist(mysql, headers, playlist, track_ids, group_id):
     # Create a new playlist
     user_id = get_user(mysql, headers)
     url = f'https://api.spotify.com/v1/users/{user_id}/playlists'
@@ -343,5 +344,13 @@ def create_rec_playlist(mysql, headers, playlist):
         'uris': playlist
     }
     data = requests.post(url=url, json=params, headers=headers).json()
+    cursor = mysql.connection.cursor()
+    cursor.excute("select group_name from Clubs where group_id = '%s'", group_id)
+    group_name = cursor.fetchall()
+    for i in range(len(track_ids)):
+        cursor.execute("select Track_name from Tracks where Track_ID = '%s'", track_ids[i])
+        track_name = cursor.fetchall()
+        cursor.execute("insert into Playlists(Group_ID, Group_name, Playlist_ID, User_ID, Track_ID, Track_name) values (%s, %s, %s, %s, %s, %s);",
+                (group_id, group_name, playlist_id, user_id, track_ids[i], track_name));
 
 

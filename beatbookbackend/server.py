@@ -307,8 +307,8 @@ def create_dorm_party_route(group_id):
         return jsonify({"error": "Unauthorized"}), 401
 
     tracks = find_clusters(mysql, group_id)
-    tracks = get_recommendations(headers, tracks)
-    create_rec_playlist(mysql, headers, tracks)
+    tracks, track_ids = get_recommendations(headers, tracks)
+    create_rec_playlist(mysql, headers, tracks, track_ids, group_id)
 
 
 
