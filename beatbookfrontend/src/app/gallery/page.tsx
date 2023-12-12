@@ -164,7 +164,7 @@ const GroupsGallery: React.FC = () => {
         </div>
         <div className="flex items-center justify-center mb-4">
         <button
-          className="block mx-auto bg-blue-600 text-black p-2 rounded hover:bg-green-600 focus:outline-none"
+          className="block mx-auto bg-blue-600 text-white p-2 rounded hover:bg-green-600 focus:outline-none"
           onClick={() => setCreateGroupModalOpen(true)}
         >
           Create Group

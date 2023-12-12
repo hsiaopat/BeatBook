@@ -171,23 +171,39 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
             </div>
           </div>
         </nav>
-
-        <div className="bg-white p-8 rounded-md shadow-md">
-  <h1 className="text-2xl font-bold mb-4">Group ID: {group.group_id}</h1>
-  <p className="text-lg">Group Name: {group.group_name}</p>
+  {/* Title Section */}
 
   <div className="mt-6">
-    <h2 className="text-3xl font-bold mb-4">Group Members</h2>
-    <ul className="list-disc pl-6">
+  <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
+  <h1 className="text-4xl font-bold mb-4">{group.group_name}</h1>
+    <h2 className="text-3xl font-bold mb-2">Group Members</h2>
+    <div className="pl-6 items-center">
       {group.group_members.map((member, index) => (
-        <li key={index} className="mb-2">{member}</li>
+        <p key={index} className="mb-2">{member}</p>
       ))}
-    </ul>
-  </div>
-  </div>
+    </div>
+</div>
 
-  <div className="sm:flex items-center justify-center max-w-screen-xl h-screen">
-  <div className="sm:w-1/2 p-5 text-center">
+{/* Join/Leave Group Buttons */}
+<div className="flex items-center justify-center mb-4 space-x-4">
+  <button
+    className="bg-blue-600 text-white p-2 rounded hover:bg-green-600 focus:outline-none"
+  >
+    Join Group
+  </button>
+  <button
+    className="bg-blue-600 text-white p-2 rounded hover:bg-green-600 focus:outline-none"
+  >
+    Leave Group
+  </button>
+</div>
+
+
+
+
+  {/* About Section */}   
+  <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6 bg-blue-200">
+  <div className="text-center sm:w-1/2 p-5 my-4 light-section">
     <div className="text">
       <span className="text-gray-500 border-b-2 border-blue-600 uppercase">What is this?</span>
       <h2 className="my-4 font-bold text-3xl sm:text-4xl">About <span className="text-blue-600">Dorm Party/Wrapped</span></h2>
@@ -199,24 +215,43 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
   </div>
 </div>
 
+<div className="mx-auto max-w-screen-xl flex flex-col items-center justify-center mt-4">
+  <div className="flex justify-between items-center">
+    {/* Container 1 */}
+    <Link href="https://www.spotify.com">
+      <a>
+        <div className="flex flex-col items-center border border-gray-300 p-4 rounded-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer w-64 h-48">
+          <div className="bg-blue-600 text-white p-4 rounded-md">
+            Dorm Party
+          </div>
+          <p className="text-gray-600 mt-2">Explore your BeatBook with DormParty!</p>
+        </div>
+      </a>
+    </Link>
+  </div>
+</div>
+
     
-
         
         
-
+  {/* Dorm Wrapped Section*/}
     {/* Make Cluster recommendation playlist*/}
+    <div className="mx-auto max-w-screen-xl flex flex-col items-center justify-center min-h-screen">
 
-  <h2 className="my-4 font-bold text-4xl sm:text-4xl">Dorm Wrapped</h2>
+    <h2 className="my-4 font-bold text-4xl sm:text-4xl">Dorm Wrapped</h2>
 
     {/* Artist Pie */}
-    <h2 className="text-3xl font-bold mb-4">Artist Listening Distribution</h2>
-    <div className="mt-8">
+    <h2 className="text-3xl font-bold mb-4 center-items">Artist Listening Distribution</h2>
+    <div className="mt-8 center-items">
     <div className="text-3xl font-bold mb-4 mx-auto" id="pieChart" style={{ margin: '20px auto' }}></div>
+    </div>
     </div>
      {/* Add more details about the group as needed */}
     {/*Shared Artists*/}
      <div className="mt-8">
-        <h2 className="text-3xl font-bold mb-4">Shared Artists</h2>
+        <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
+        <h2 className="text-3xl font-bold mb-4 center-">Shared Artists</h2>
+        </div>
         <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {group.shared_artists.map((artist) => (
             <li key={artist['Artist Name']} className="bg-blue-100 p-4 rounded-md">
@@ -228,7 +263,9 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
 
       {/* Unique Tracks Section */}
       <div className="mt-8">
-        <h2 className="text-3xl font-bold mb-4">Shared Tracks</h2>
+      <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
+        <h2 className="text-3xl font-bold mb-4 center-items">Shared Tracks</h2>
+        </div>
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {group.shared_tracks.map((track, index) => (
             <li key={index} className="bg-green-100 p-4 rounded-md">
@@ -237,24 +274,37 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
           ))}
         </ul>
       </div>
-      <p>Features: {JSON.stringify(group.features)}</p>
-      <p>Feature Diff: {JSON.stringify(group.feature_diff)}</p>
 
-      <div className="flex justify-between items-center">
-      {/* Container 1 */}
-      <Link href="/">
-        <a>
-          <div className="flex flex-col items-center border border-gray-300 p-4 rounded-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer w-64 h-48">
-            <div className="bg-blue-600 text-white p-4 rounded-md">
-              Dorm Party
-            </div>
-            <p className="text-gray-600 mt-2">Explore your BeatBook with DormParty!</p>
-          </div>
-        </a>
-      </Link>
-   </div>
+     {/* Group Features and Feature Differences Table */}
+    <div className="mt-8">
+    <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
+      <h2 className="text-3xl font-bold mb-4 center-items">Group Features</h2>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="table-auto mx-auto border border-gray-400 shadow-lg rounded-md">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="py-2 px-4 border">Feature</th>
+              <th className="py-2 px-4 border">Average Value</th>
+              <th className="py-2 px-4 border">User-Group Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            {group.features.map((value, index) => (
+              <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
+                <td className="py-2 px-4 border">{['avg_popularity', 'avg_acousticness', 'avg_danceability', 'avg_energy', 'avg_instrumentalness', 'avg_loudness', 'avg_temp', 'avg_valence'][index]}</td>
+                <td className="py-2 px-4 border">{value}</td>
+                <td className="py-2 px-4 border">{group.feature_diff[index]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
   </div>
-   
+   </div>
  );
 };
 
