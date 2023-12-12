@@ -352,5 +352,6 @@ def create_rec_playlist(mysql, headers, playlist, track_ids, group_id):
         track_name = cursor.fetchall()
         cursor.execute("insert into Playlists(Group_ID, Group_name, Playlist_ID, User_ID, Track_ID, Track_name) values (%s, %s, %s, %s, %s, %s);",
                 (group_id, group_name, playlist_id, user_id, track_ids[i], track_name));
-
+        cursor.connection.commit()
+    cursor.close()
 

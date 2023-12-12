@@ -9,13 +9,13 @@ Code to implement our take on Spotify Wrapped
 def get_user_feature_values(mysql, username):
     cursor = mysql.connection.cursor()
 
-    cursor.execute("select User_Tracks.username, avg(popularity), avg(acousticness), \
+    cursor.execute("select T.username, avg(popularity), avg(acousticness), \
                            avg(danceability), avg(energy), avg(instrumentalness), \
                            avg(loudness), avg(temp), avg(valence) \
-                    from User_Tracks, Track_Attributes \
-                    where User_Tracks.Track_ID = Track_Attributes.Track_ID and \
-                          User_Tracks.username = %s \
-                    group by User_Tracks.username", (username,))
+                    from (select User_Tracks_All.username, popularity, acousticness, danceability, energy, instrumentalness, loudness, temp, valence from User_Tracks_All, Track_Attributes \
+                    where User_Tracks_All.Track_ID = Track_Attributes.Track_ID and \
+                          User_Tracks_All.username = %s and User_Tracks_All.type = 'short_term' \
+                    sort by User_Tracks_All.date limit 50) as T group by T.username", (username,))
     
     result = []
     if result is None:
@@ -66,10 +66,10 @@ def shared_top_tracks(mysql, group_num):
     cursor = mysql.connection.cursor()
 
     cursor.execute("select Track_name, Artist_name, Album_name \
-                    from (select Track_ID, count(Track_ID) as count \
-                          from User_Tracks, Group_%s \
-                          where User_Tracks.username = Group_%s.Member_username \
-                          group by Track_ID \
+                    from (select Q.Track_ID, count(Q.Track_ID) as count \
+                          from (select Track_ID from User_Tracks_All, Group_%s \
+                          where User_Tracks_All.username = Group_%s.Member_username and User_Tracks_All.type = 'short_term' sort by User_Tracks_All.date limit 50) as Q \
+                          group by Q.Track_ID \
                           order by count desc) as T, Tracks \
                     where T.count > 1 and Tracks.Track_ID = T.Track_ID", (group_num, group_num))
 
@@ -85,10 +85,10 @@ def shared_top_artists(mysql, group_num):
     cursor = mysql.connection.cursor()
 
     cursor.execute("select Artist_name \
-                    from (select Artist_ID, count(Artist_ID) as count \
-                          from User_Artist, Group_%s \
-                          where User_Artist.username = Group_%s.Member_username \
-                          group by Artist_ID \
+                    from (select Q.Artist_ID, count(Q.Artist_ID) as count \
+                          from (select Artist_ID from User_Artists_All, Group_%s \
+                          where User_Artists_All.username = Group_%s.Member_username and User_Artists_All.type = 'short_term' sort by User_Artists_All.date limit 50) as Q \
+                          group by Q.Artist_ID \
                           order by count desc) as T, Artist \
                     where T.count > 1 and Artist.Artist_ID = T.Artist_ID", (group_num, group_num))
 
@@ -104,9 +104,9 @@ def artists_pie(mysql, group_num):
     cursor = mysql.connection.cursor()
 
     cursor.execute("select Artist_name, count(Tracks.Track_ID) as count \
-                    from User_Tracks, Group_%s, Tracks \
-                    where User_Tracks.username = Group_%s.Member_username and \
-                          Tracks.Track_ID = User_Tracks.Track_ID \
+                    from (select Artist_name, Tracks.Track_ID from User_Tracks_All, Group_%s, Tracks \
+                    where User_Tracks_All.username = Group_%s.Member_username and \
+                          Tracks.Track_ID = User_Tracks_All.Track_ID and User_Tracks_All.type = 'short_term' sort by User_Tracks_All.date limit 50) as Q \
                     group by Artist_name \
                     order by count desc", (group_num, group_num))
     
@@ -130,9 +130,9 @@ def unique_tracks(mysql, group_num, username):
     
     cursor.execute("select Track_name, Artist_name, Album_name \
                     from (select Track_ID, count(Track_ID) as count \
-                          from User_Tracks, Group_%s \
-                          where User_Tracks.username = Group_%s.Member_username \
-                                and User_Tracks.username = %s \
+                          from (select Track_ID from User_Tracks_All, Group_%s \
+                          where User_Tracks_All.username = Group_%s.Member_username \
+                                and User_Tracks_All.username = %s and User_Tracks_All.type = 'short_term' sort by User_Tracks_All.date limit 50) as Q\
                           group by Track_ID \
                           order by count desc) as T, Tracks \
                     where T.count = 1 and Tracks.Track_ID = T.Track_ID", (group_num, group_num, username))
