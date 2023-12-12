@@ -147,7 +147,7 @@ def top_tracks():
        username = get_user(mysql, headers)
 
        # Get the user's top tracks
-       tracks, tracks_id = get_user_short_term_top_tracks(mysql, headers)
+       tracks, tracks_id, album_url = get_user_short_term_top_tracks(mysql, headers)
 
        # Render a template or return the data in JSON format
        return jsonify({'tracks': tracks, 'tracks_id': tracks_id})
