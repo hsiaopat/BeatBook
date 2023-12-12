@@ -2,9 +2,13 @@ import requests
 import pprint
 from collections import Counter
 from pandas import DataFrame
-from collections import Counter
 from datetime import date
-def get_user(mysql, headers):
+
+def get_user(mysql, headers, cursor=None):
+    passed_cur = False
+    if cursor:
+        passed_cur = True
+
     # Request user's profile from the spotify API
     r = requests.get(url='https://api.spotify.com/v1/me', headers=headers)
 
@@ -13,7 +17,8 @@ def get_user(mysql, headers):
     display_name = r.json()['display_name']
 
     # Select the usernames from the database
-    cursor = mysql.connection.cursor()
+    if not passed_cur:
+        cursor = mysql.connection.cursor()
     cursor.execute("select username from Users");
     usernames = [row[0] for row in cursor.fetchall()]
 
@@ -23,7 +28,8 @@ def get_user(mysql, headers):
             (username, display_name));
         cursor.connection.commit()
 
-    cursor.close()
+    if not passed_cur:
+        cursor.close()
 
     return username
 
@@ -87,7 +93,11 @@ def get_user_short_term_top_artists(mysql, headers):
 
 
 # Get user top tracks for short, medium and long term
-def get_user_top_tracks(mysql, headers):
+def get_user_top_tracks(mysql, headers, cursor=None):
+    passed_cur = False
+    if cursor:
+        passed_cur = True
+
     times = ['short_term', 'medium_term', 'long_term']
     for time in times:
 
@@ -99,7 +109,7 @@ def get_user_top_tracks(mysql, headers):
         }
 
         data = requests.get(url=url, params=params, headers=headers).json()
-        username = get_user(mysql, headers)
+        username = get_user(mysql, headers, cursor)
         tracks = []
         tracks_id = []
         for item in data['items']:
@@ -125,8 +135,10 @@ def get_user_top_tracks(mysql, headers):
                 artist_link = ""
             track_duration = item['duration_ms']
             track_popular = item['popularity']
+
             #Select the Track Id from the database
-            cursor = mysql.connection.cursor()
+            if not passed_cur:
+                cursor = mysql.connection.cursor()
             cursor.execute("select Track_ID from Tracks");
             tracks_id_current = [row[0] for row in cursor.fetchall()]
             cursor.execute("select Track_ID, username from User_Tracks_All")
@@ -170,14 +182,16 @@ def get_user_top_tracks(mysql, headers):
                 #cursor.execute("insert into User_Tracks (Track_ID, username) values (%s, %s)" , 
                 #    (track_id, username))
                 cursor.connection.commit()
-            cursor.close() 
+            
+            if not passed_cur:
+                cursor.close() 
     
 
     return tracks, tracks_id
 
 
 # Get user top artists data for short, medium and long term
-def get_all_user_top_artists(mysql, headers):
+def get_all_user_top_artists(mysql, headers, cursor=None):
     times = ['short_term', 'medium_term', 'long_term']
     for time in times:
 
@@ -192,14 +206,16 @@ def get_all_user_top_artists(mysql, headers):
         artists = []
         artists_id_db = []
         artists_id = []
-        username = get_user(mysql, headers)
+        username = get_user(mysql, headers, cursor)
         for item in data['items']:
             artist_name = item['name']
             artists.append(artist_name)
             artist_id = item['id']
             artists_id.append(artist_id)
+            
             # Select the artist id from the database
-            cursor = mysql.connection.cursor()
+            if cursor is None:
+                cursor = mysql.connection.cursor()
             cursor.execute("select Artist_ID from Artist");
             artists_id_db = [row[0] for row in cursor.fetchall()]
             cursor.execute("select Artist_ID, username from User_Artists_All")

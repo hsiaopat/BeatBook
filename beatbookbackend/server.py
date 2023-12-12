@@ -6,6 +6,7 @@ from spotify_api import *
 from flask import jsonify 
 from flask_cors import CORS
 import logging
+from threading import Thread
 from groups import *
 from playlist_cluster import *
 from wrapped import *
@@ -88,23 +89,48 @@ def home():
    return 'Hello World'
 
 
-
-
 @app.route('/login')
 def login():
-   # login function redirects to callback screen after Spotify user authorization
-   return redirect(request_user_authorization())
+    # login function redirects to callback screen after Spotify user authorization
+    return redirect(request_user_authorization())
 
 
+def run_func():
+    global headers
+    global mysql
+
+    with app.app_context():
+
+        cur = mysql.connection.cursor()
+        get_user_top_tracks(mysql, headers, cur)
+        mysql.connection.commit()
+        cur.close()
+        print("done!")
+        
+
+
+    #cur2 = mysql.connection.cursor()
+    #thr2 = Thread(target=get_all_user_top_artists, args=[mysql, cur2, headers])
+    #thr2.start()
+
+    return thr
 
 
 @app.route('/callback')
 def callback():
-   # use the user authorization to get an access code to get their personal data
-   #   from the Spotify API
-   global headers
-   headers = request_authcode_access_token(request.args.get('code'))
-   return redirect('http://129.74.153.235:5029/')
+    # Use the user authorization to get an access code to get their personal data
+    #   from the Spotify API
+    global headers
+    headers = request_authcode_access_token(request.args.get('code'))
+
+    # Start a background thread to get top tracks and artists when the user logs in
+    thr = Thread(target=run_func)
+    thr.start()
+
+    #get_user_top_tracks(mysql, headers)
+    #get_all_user_top_artists(mysql, headers)
+
+    return redirect('http://129.74.153.235:5029/')
 
 
 @app.route('/toptracks')
@@ -116,13 +142,11 @@ def top_tracks():
        # Get the username from the get_user Spotify API call
        username = get_user(mysql, headers)
 
-
        # Get the user's top tracks
-       tracks, tracks_id = get_user_top_tracks(mysql, headers)
-       print(tracks)
+       tracks, tracks_id = get_user_short_term_top_tracks(mysql, headers)
+
        # Render a template or return the data in JSON format
        return jsonify({'tracks': tracks, 'tracks_id': tracks_id})
-
 
    return 'Hello World'
 
@@ -136,13 +160,11 @@ def top_artists():
        # Get the username from the get_user Spotify API call
        username = get_user(mysql, headers)
 
-
        # Get the user's top tracks
-       artists, artists_id = get_all_user_top_artists(mysql, headers)
-       print(artists)
+       artists, artists_id = get_user_short_term_top_artists(mysql, headers)
+
        # Render a template or return the data in JSON format
        return jsonify({'artists': artists, 'artists_id': artists_id})
-
 
    return 'Hello World'
 
