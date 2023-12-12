@@ -283,6 +283,7 @@ def create_dorm_party_route(group_id):
     tracks = find_clusters(mysql, group_id)
     tracks = get_recommendations(headers, tracks)
     create_rec_playlist(mysql, headers, tracks)
+    return "Success"
 
 
 

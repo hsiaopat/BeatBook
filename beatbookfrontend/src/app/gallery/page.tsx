@@ -80,22 +80,18 @@ const GroupsGallery: React.FC = () => {
 
   const handleCreateGroup = async () => {
     try {
-      // Prompt the user for the group name (you can use a prompt, input field, etc.)
-      const group_name = prompt('Enter group name:');
-      if (!group_name) {
-        // Handle case where group_name is not provided
-        console.error('Group name not provided');
-        return;
-      }
-
-      // Make the POST request with the group_name parameter
-      const response = await axios.post('http://129.74.153.235:5028/creategroup', { group_name });
+      // Make the POST request with the newGroupName parameter
+      const response = await axios.post('http://129.74.153.235:5028/creategroup', { group_name: newGroupName });
       console.log(response.data);
       // add code to update UI or perform additional actions after creating
+      // For example, you might want to clear the input field and close the modal
+      setNewGroupName('');
+      setCreateGroupModalOpen(false);
     } catch (error) {
       console.error(error);
     }
   };
+  
 
 
   useEffect(() => {
@@ -243,7 +239,7 @@ const GroupsGallery: React.FC = () => {
                    <button id="createGroupButton"
                    type="button"
                    className="ml-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-transparent rounded-md hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                   onClick={() => setCreateGroupModalOpen(false)}
+                   onClick={() => handleCreateGroup()}
                  >
                    Create Group
                   </button>

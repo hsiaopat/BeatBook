@@ -37,6 +37,33 @@ const GroupPage: React.FC = () => {
    }
  };
 
+ const handleJoinGroup = async () => {
+  try {
+
+    const response = await axios.post('http://129.74.153.235:5028/joingroup');
+
+    // Handle the response as needed
+    console.log(response.data);
+
+  } catch (error) {
+    console.error('Error joining the group:', error);
+  }
+};
+
+const handleLeaveGroup = async () => {
+  try {
+    //const groupParams: [string, string][] = Array.from(searchParams.entries());
+    //const group_id = groupParams.find(([key]) => key === 'group_id')?.[1];
+    const response = await axios.post('http://129.74.153.235:5028/leavegroup');
+
+    // Handle the response as needed
+    console.log(response.data);
+
+  } catch (error) {
+    console.error('Error leaving the group:', error);
+  }
+};
+
 
  const handleCreateDormParty = async () => {
   try {
@@ -188,12 +215,12 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
 <div className="flex items-center justify-center mb-4 space-x-4">
   <button
     className="bg-blue-600 text-white p-2 rounded hover:bg-green-600 focus:outline-none"
-  >
+    onClick={handleJoinGroup}>
     Join Group
   </button>
   <button
     className="bg-blue-600 text-white p-2 rounded hover:bg-green-600 focus:outline-none"
-  >
+    onClick={handleLeaveGroup}>
     Leave Group
   </button>
 </div>
@@ -219,9 +246,9 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
   <div className="flex justify-between items-center">
     {/* Container 1 */}
     <Link href="https://www.spotify.com">
-      <a>
+      <a onClick={handleCreateDormParty}>
         <div className="flex flex-col items-center border border-gray-300 p-4 rounded-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer w-64 h-48">
-          <div className="bg-blue-600 text-white p-4 rounded-md">
+          <div className="bg-blue-600 text-white p-4 rounded-md" >
             Dorm Party
           </div>
           <p className="text-gray-600 mt-2">Explore your BeatBook with DormParty!</p>
