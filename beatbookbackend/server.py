@@ -95,7 +95,7 @@ def login():
     return redirect(request_user_authorization())
 
 
-def run_func():
+def thread_get_tracks():
     global headers
     global mysql
 
@@ -105,15 +105,19 @@ def run_func():
         get_user_top_tracks(mysql, headers, cur)
         mysql.connection.commit()
         cur.close()
-        print("done!")
+        print("tracks done!")
         
+def thread_get_artists():
+    global headers
+    global mysql
 
+    with app.app_context():
 
-    #cur2 = mysql.connection.cursor()
-    #thr2 = Thread(target=get_all_user_top_artists, args=[mysql, cur2, headers])
-    #thr2.start()
-
-    return thr
+        cur = mysql.connection.cursor()
+        get_all_user_top_artists(mysql, headers, cur)
+        mysql.connection.commit()
+        cur.close()
+        print("artists done!")
 
 
 @app.route('/callback')
@@ -124,7 +128,7 @@ def callback():
     headers = request_authcode_access_token(request.args.get('code'))
 
     # Start a background thread to get top tracks and artists when the user logs in
-    thr = Thread(target=run_func)
+    thr = Thread(target=thread_get_tracks)
     thr.start()
 
     #get_user_top_tracks(mysql, headers)
