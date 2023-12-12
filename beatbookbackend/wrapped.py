@@ -25,7 +25,7 @@ def get_user_feature_values(mysql, username):
         cursor.close()
         return []
     
-    result = [float(value) if isinstance(value, Decimal) else value for value in result]
+    result = [round(float(value), 2) if isinstance(value, Decimal) else value for value in result]
 
     cursor.close()
 
@@ -140,7 +140,7 @@ def artists_pie(mysql, group_num):
     cursor.close()
 
     total_songs = df['Num Songs'].sum()
-    df['Percent Top Songs'] = (df['Num Songs'] / total_songs) * 100
+    df['Percent Top Songs'] = round((df['Num Songs'] / total_songs) * 100, 2)
 
     return df
 
