@@ -98,12 +98,13 @@ def shared_top_artists(mysql, group_num):
     cursor.execute("select Artist_name \
                     from (select Q.Artist_ID, count(Q.Artist_ID) as count \
                           from (select Artist_ID from User_Artists_All, Group_%s \
-                          where User_Artists_All.username = Group_%s.Member_username and User_Artists_All.type = 'short_term' order by User_Artists_All.date limit 50) as Q \
+                          where User_Artists_All.username = Group_%s.Member_username and User_Artists_All.type = 'short_term' order by User_Artists_All.date) as Q \
                           group by Q.Artist_ID \
                           order by count desc) as T, Artist \
                     where T.count > 1 and Artist.Artist_ID = T.Artist_ID", (group_num, group_num))
 
     df = DataFrame(cursor.fetchall())
+    print(df)
     cursor.close()
 
     # Check for no shared artists
