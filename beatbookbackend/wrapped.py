@@ -20,18 +20,15 @@ def get_user_feature_values(mysql, username):
     result = cursor.fetchone()
     cursor.close()
 
-
     if result is None:
         # Return a default value or handle the case when no data is found
         return []
     
-    result = [round(float(value), 2) if isinstance(value, Decimal) else value for value in result]
+    users = result[0]
+    data = result[1:]
+    data = [round(float(value), 2) if isinstance(value, Decimal) else round(float(value), 2) for value in data]
 
-
-    #result = [float(value) if isinstance(value, Decimal) else value for value in result]
-
-    print('user features: ', result)
-    return result
+    return [users] + data
 
 
 # Add the track features for all users in a group into a dataframe and return the average for each column
@@ -43,7 +40,6 @@ def get_group_feature_values(mysql, group_num):
     result = list(cursor.fetchall())
     users = [value[0] for value in result]
 
-    print('users', users)
     cursor.close()
 
     # Dataframe to hold feature values for each user in the group
@@ -56,7 +52,6 @@ def get_group_feature_values(mysql, group_num):
 
     avg_features = list(df[feature_columns].mean())
 
-    print('average features: ', avg_features)
     return avg_features
 
 # Find the difference between the user track values and the group average
@@ -67,7 +62,7 @@ def get_user_feature_diff(mysql, group_num, username):
     print(group)
     print(user)
 
-    diff = [user[i] - group[i] for i in range(len(group))]
+    diff = [round(user[i] - group[i], 2) for i in range(len(group))]
 
     return diff
 
@@ -166,8 +161,6 @@ def unique_tracks(mysql, group_num, username):
     df.columns = ['Track Name', 'Artist Name', 'Album Name']
 
     cursor.close()
-
-    print(df)
 
     return df
 
