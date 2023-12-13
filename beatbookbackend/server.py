@@ -317,7 +317,7 @@ def display_group_info_route(group_id):
         group_dict['shared_artists'] = []
 
     try:
-        group_dict['shared_tracks'] = shared_tracks_data.to_dict(orient='records')
+        group_dict['shared_tracks'] = shared_tracks_data
     except:
         print("failed shared tracks")
         print(shared_tracks_data)

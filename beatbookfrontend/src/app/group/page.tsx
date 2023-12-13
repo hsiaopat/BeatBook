@@ -312,7 +312,8 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {group.shared_tracks.map((track, index) => (
                 <li key={index} className="bg-green-100 p-4 rounded-md">
-                  <strong>{track[0]}</strong> - {track[1]} - {track[2]}
+                  <img src={track[2]} alt={`Track ${index + 1}`} className="ml-3 w-10 h-10" />
+                  <strong>{track[0]}</strong> - {track[1]}
                 </li>
               ))}
             </ul>
