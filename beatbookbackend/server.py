@@ -94,6 +94,9 @@ def login():
     # login function redirects to callback screen after Spotify user authorization
     return redirect(request_user_authorization())
 
+def is_logged_in():
+    global headers
+    return ('Authorization' in headers)
 
 def thread_get_tracks():
     global headers
@@ -139,10 +142,10 @@ def callback():
 
 @app.route('/toptracks')
 def top_tracks():
-   global headers
+    global headers
 
 
-   if 'Authorization' in headers:
+    if 'Authorization' in headers:
        # Get the username from the get_user Spotify API call
        username = get_user(mysql, headers)
 
@@ -153,8 +156,8 @@ def top_tracks():
 
        # Render a template or return the data in JSON format
        return jsonify({'tracks': tracks, 'tracks_id': tracks_id, 'tracks_img': tracks_images})
-
-   return 'Hello World'
+    
+    return 'Hello World'
 
 
 @app.route('/topartists')

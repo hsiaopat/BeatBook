@@ -3,8 +3,7 @@ import Link from 'next/link';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
 import axios from 'axios';
-import Image from 'next/image';
-
+import { useState, useEffect } from 'react';
 
 const Container = styled('div')({
   display: 'flex',
@@ -76,6 +75,7 @@ const SpotifyLoginButton = styled(Button)({
 
 
 const HomePage = () => {
+  const [isLoggedIn, setLoggedIn] = useState(false);
   const redirectToSpotify = async () => {
     try {
       const spotifyAuthUrl = 'http://129.74.153.235:5028/login';
@@ -84,6 +84,12 @@ const HomePage = () => {
       console.error('Error initiating Spotify login:', error);
     }
   };
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      redirectToSpotify()
+    }
+  }, []);
   
 
   return (

@@ -42,11 +42,13 @@ const GroupPage: React.FC = () => {
     const groupParams: [string, string][] = Array.from(searchParams.entries());
     const group_id = groupParams.find(([key]) => key === 'group_id')?.[1];
 
-    const response = await axios.post('http://129.74.153.235:5028/joingroup', {group_id});
+    const response = await axios.post('http://129.74.153.235:5028/joingroup', { group_id });
+
+    const groupUrl = 'http://129.74.153.235:5028/group?group_id=' + group_id;
+    window.location.href = groupUrl;
 
     // Handle the response as needed
     console.log(response.data);
-
   } catch (error) {
     console.error('Error joining the group:', error);
   }
@@ -56,11 +58,13 @@ const handleLeaveGroup = async () => {
   try {
     const groupParams: [string, string][] = Array.from(searchParams.entries());
     const group_id = groupParams.find(([key]) => key === 'group_id')?.[1];
-    const response = await axios.post('http://129.74.153.235:5028/leavegroup', {group_id});
+    const response = await axios.post('http://129.74.153.235:5028/leavegroup', { group_id });
 
+  
     // Handle the response as needed
     console.log(response.data);
-
+    const groupUrl = 'http://129.74.153.235:5028/group?group_id='+ group_id;
+    window.location.href = groupUrl;
   } catch (error) {
     console.error('Error leaving the group:', error);
   }
