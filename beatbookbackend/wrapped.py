@@ -71,26 +71,33 @@ def get_user_feature_diff(mysql, group_num, username):
 def shared_top_tracks(mysql, group_num):
     cursor = mysql.connection.cursor()
 
-    cursor.execute("select Track_name, Artist_name, Album_name \
-                    from (select Q.Track_ID, count(Q.Track_ID) as count \
-                          from (select Track_ID from User_Tracks_All, Group_%s \
-                          where User_Tracks_All.username = Group_%s.Member_username and User_Tracks_All.type = 'short_term' order by User_Tracks_All.date limit 50) as Q \
-                          group by Q.Track_ID \
-                          order by count desc) as T, Tracks \
-                    where T.count > 1 and Tracks.Track_ID = T.Track_ID", (group_num, group_num))
+    cursor.execute("select Member_username from Group_%s", (group_num,))
+    users = list(cursor.fetchall())
 
-    df = DataFrame(cursor.fetchall())
+    all_tracks = []
+    for u in users:
+        cursor.execute("select Track_ID \
+                    from User_Tracks_All, Group_%s \
+                    where User_Tracks_All.username = %s and User_Tracks_All.type = 'short_term' \
+                    order by User_Tracks_All.date \
+                    limit 50", (group_num, u))
+
+        data = [row[0] for row in cursor.fetchall()]
+        all_tracks.append(data)
     
-    # Check for no shared tracks
-    if len(df) == 0:
-        cursor.close()
-        return []
+    # Find shared tracks
+    flat_tracks = [item for sublist in all_tracks for item in sublist]
+    counts = Counter(flat_tracks)
+    duplicates = [item for item, count in counts.items() if count > 1]
 
-    df.columns = ['Track Name', 'Artist Name', 'Album Name']
+    
+    
+
+    #df.columns = ['Track Name', 'Artist Name', 'Album Name']
 
     cursor.close()
 
-    return df
+    return duplicates
 
 # Find top artists that are shared among group members
 def shared_top_artists(mysql, group_num):
@@ -101,11 +108,11 @@ def shared_top_artists(mysql, group_num):
 
     all_artists = []
     for u in users:
-        cursor.execute("select Artist_ID \
-                        from User_Artists_All, Group_%s \
-                        where User_Artists_All.username = %s and User_Artists_All.type = 'short_term' \
+        cursor.execute("select Artist_name \
+                        from User_Artists_All, Artist \
+                        where User_Artists_All.username = %s and User_Artists_All.Artist_ID = Artist.Artist_ID and User_Artists_All.type = 'short_term' \
                         order by User_Artists_All.date \
-                        limit 50", (group_num, u))
+                        limit 50", (u,))
 
         data = [row[0] for row in cursor.fetchall()]
         all_artists.append(data)
