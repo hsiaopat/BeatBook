@@ -15,9 +15,9 @@ interface GroupData {
   group_members: string[];
   features: number[];
   feature_diff: number[];
-  shared_artists: { 'Artist Name': string }[];
+  shared_artists: string[];
   artists_pie: { 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }[];
-  shared_tracks: { 'Track Name': string; 'Artist Name': string; 'Album Name': string }[];
+  shared_tracks: [string, string, string][];
   // Add more properties as needed
 }
 
@@ -288,9 +288,9 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
         <div>
           {group.shared_artists.length > 0 ? (
             <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {group.shared_artists.map((artist) => (
-                <li key={artist['Artist Name']} className="bg-blue-100 p-4 rounded-md">
-                  {artist['Artist Name']}
+              {group.shared_artists.map((artist, index) => (
+                <li key={index} className="bg-blue-100 p-4 rounded-md">
+                  {artist}
                 </li>
               ))}
             </ul>
@@ -312,7 +312,7 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {group.shared_tracks.map((track, index) => (
                 <li key={index} className="bg-green-100 p-4 rounded-md">
-                  <strong>{track['Track Name']}</strong> - {track['Artist Name']} - {track['Album Name']}
+                  <strong>{track[0]}</strong> - {track[1]} - {track[2]}
                 </li>
               ))}
             </ul>

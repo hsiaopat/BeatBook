@@ -310,11 +310,11 @@ def display_group_info_route(group_id):
         'feature_diff': feature_diff,
     }
     try:
-        group_dict['shared_artists'] = shared_artists.to_dict(orient='records')  # Convert DataFrame to a list of dictionaries
+        group_dict['shared_artists'] = shared_artists  # Convert DataFrame to a list of dictionaries
     except:
         print("failed shared artists")
         print(shared_artists)
-        group_dict['shared_artists'] = {}
+        group_dict['shared_artists'] = []
 
     try:
         group_dict['shared_tracks'] = shared_tracks_data.to_dict(orient='records')
