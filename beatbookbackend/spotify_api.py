@@ -336,28 +336,33 @@ def get_user_stats(mysql, headers):
         cursor.close()
 
 # Get recommendations based on a list of lists of tracks within clusters
-def get_recommendations(headers, tracks, group_num):
+def get_recommendations(headers, tracks):
     # Spotify API endpoint
     url = 'https://api.spotify.com/v1/recommendations'
 
     # Request data from Spotify endpoint
     playlist = []
-    t = []
+    t_id = []
+    t_name = []
     for group in tracks:
         params = {
             'seed_tracks': ','.join(group),
             'limit': 2  
         }
 
-        data = requests.get(url=url, params=params, headers=headers).json()
+        response = requests.get(url=url, params=params, headers=headers)
+        data = response.json()
+
         for item in data['tracks']:
             playlist.append(item['uri'])
-            t.append(item['id'])
+            t_id.append(item['id'])
+            t_name.append(item['name'])
+
     # Return list of track uris to be in the playlist
-    return playlist,t
+    return playlist, t_id, t_name
 
 # Create recommendation playlist
-def create_rec_playlist(mysql, headers, playlist, track_ids, group_id):
+def create_rec_playlist(mysql, headers, playlist, track_ids, track_names, group_id):
     # Create a new playlist
     user_id = get_user(mysql, headers)
     url = f'https://api.spotify.com/v1/users/{user_id}/playlists'
@@ -374,14 +379,18 @@ def create_rec_playlist(mysql, headers, playlist, track_ids, group_id):
         'uris': playlist
     }
     data = requests.post(url=url, json=params, headers=headers).json()
+    print(data)
+
     cursor = mysql.connection.cursor()
-    cursor.excute("select group_name from Clubs where group_id = '%s'", group_id)
+    cursor.execute("select group_name from Clubs where group_id = %s", (group_id,))
     group_name = cursor.fetchall()
     for i in range(len(track_ids)):
-        cursor.execute("select Track_name from Tracks where Track_ID = '%s'", track_ids[i])
-        track_name = cursor.fetchall()
-        cursor.execute("insert into Playlists(Group_ID, Group_name, Playlist_ID, User_ID, Track_ID, Track_name) values (%s, %s, %s, %s, %s, %s);",
-                (group_id, group_name, playlist_id, user_id, track_ids[i], track_name));
-        cursor.connection.commit()
+        cursor.execute("select Playlist_ID from Playlists")
+        playlist_ids = [row[0] for row in cursor.fetchall()]
+
+        if playlist_id not in playlist_ids:
+            cursor.execute("insert into Playlists (Group_ID, Group_name, Playlist_ID, User_ID, Track_ID, Track_name) values (%s, %s, %s, %s, %s, %s)", 
+                (int(group_id), group_name, playlist_id, user_id, track_ids[i], track_names[i]))
+            cursor.connection.commit()
     cursor.close()
 
