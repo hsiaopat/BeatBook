@@ -92,7 +92,7 @@ def shared_top_tracks(mysql, group_num):
     duplicates = [item for item, count in counts.items() if count > 1]
 
     cursor.close()
-
+    print(duplicates)
     return duplicates
 
 # Find top artists that are shared among group members
