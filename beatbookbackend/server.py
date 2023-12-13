@@ -53,7 +53,6 @@ def test():
    fd = get_user_feature_diff(mysql, 1, username)
    sta = shared_top_artists(mysql, 1)
    ap = artists_pie(mysql, 1)
-   ut = unique_tracks(mysql, 1, username)
    print("FV")
    print(fv)
    print("FD")
@@ -62,8 +61,6 @@ def test():
    print(sta)
    print("AP")
    print(ap)
-   print("ut")
-   print(ut)
 
 
    return 'works'
