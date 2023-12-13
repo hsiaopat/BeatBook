@@ -192,7 +192,8 @@ const createPieChart = (data: [string, number][]) => {
 
 
  if (!group) {
-   return <p>Error loading group details.</p>;
+    window.location.href = 'http://129.74.153.235:5029/gallery'
+    return 
  }
 
 
