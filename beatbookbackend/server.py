@@ -6,6 +6,7 @@ from spotify_api import *
 from flask import jsonify 
 from flask_cors import CORS
 import logging
+from threading import Thread
 from groups import *
 from playlist_cluster import *
 from wrapped import *
@@ -88,23 +89,52 @@ def home():
    return 'Hello World'
 
 
-
-
 @app.route('/login')
 def login():
-   # login function redirects to callback screen after Spotify user authorization
-   return redirect(request_user_authorization())
+    # login function redirects to callback screen after Spotify user authorization
+    return redirect(request_user_authorization())
 
 
+def thread_get_tracks():
+    global headers
+    global mysql
+
+    with app.app_context():
+
+        cur = mysql.connection.cursor()
+        get_user_top_tracks(mysql, headers, cur)
+        mysql.connection.commit()
+        cur.close()
+        print("tracks done!")
+        
+def thread_get_artists():
+    global headers
+    global mysql
+
+    with app.app_context():
+
+        cur = mysql.connection.cursor()
+        get_all_user_top_artists(mysql, headers, cur)
+        mysql.connection.commit()
+        cur.close()
+        print("artists done!")
 
 
 @app.route('/callback')
 def callback():
-   # use the user authorization to get an access code to get their personal data
-   #   from the Spotify API
-   global headers
-   headers = request_authcode_access_token(request.args.get('code'))
-   return redirect('http://129.74.153.235:5029/')
+    # Use the user authorization to get an access code to get their personal data
+    #   from the Spotify API
+    global headers
+    headers = request_authcode_access_token(request.args.get('code'))
+
+    # Start a background thread to get top tracks and artists when the user logs in
+    thr = Thread(target=thread_get_tracks)
+    thr.start()
+
+    thr2 = Thread(target=thread_get_artists)
+    thr2.start()
+
+    return redirect('http://129.74.153.235:5029/')
 
 
 @app.route('/toptracks')
@@ -116,13 +146,11 @@ def top_tracks():
        # Get the username from the get_user Spotify API call
        username = get_user(mysql, headers)
 
-
        # Get the user's top tracks
-       tracks, tracks_id = get_user_top_tracks(mysql, headers)
-       print(tracks)
-       # Render a template or return the data in JSON format
-       return jsonify({'tracks': tracks, 'tracks_id': tracks_id})
+       tracks, tracks_id, tracks_images = get_user_short_term_top_tracks(mysql, headers)
 
+       # Render a template or return the data in JSON format
+       return jsonify({'tracks': tracks, 'tracks_id': tracks_id, 'tracks_img': tracks_images})
 
    return 'Hello World'
 
@@ -136,13 +164,11 @@ def top_artists():
        # Get the username from the get_user Spotify API call
        username = get_user(mysql, headers)
 
-
        # Get the user's top tracks
-       artists, artists_id = get_all_user_top_artists(mysql, headers)
-       print(artists)
+       artists, artists_id = get_user_short_term_top_artists(mysql, headers)
+
        # Render a template or return the data in JSON format
        return jsonify({'artists': artists, 'artists_id': artists_id})
-
 
    return 'Hello World'
 
@@ -239,37 +265,42 @@ def display_groups_route():
 
 @app.route('/group/<int:group_id>')
 def display_group_info_route(group_id):
-   global headers
-   username = get_user(mysql, headers)
+    global headers
+    username = get_user(mysql, headers)
 
 
-   if 'Authorization' not in headers:
-       return jsonify({"error": "Unauthorized"}), 401
+    if 'Authorization' not in headers:
+        return jsonify({"error": "Unauthorized"}), 401
 
 
-   # Call your display_groups function here with the specific group_id
-   group = display_group_info(mysql, headers, group_id)
-   print(group)
-   features = get_user_feature_values(mysql, username)
-   feature_diff = get_user_feature_diff(mysql, group_id, username)
-   shared_artists = shared_top_artists(mysql, group_id)
-   shared_tracks_data = shared_top_tracks(mysql, group_id)
-   artist_pie = artists_pie(mysql, group_id)
-   members = get_group_display_names(mysql, group_id)
-   group_dict = {
-       'group_id': group[0],
-       'group_name': group[1],
-       'num_members': group[2],
-       'group_members': members,
-       'features': features[1:],
-       'feature_diff': feature_diff,
-       'shared_artists': shared_artists.to_dict(orient='records'),  # Convert DataFrame to a list of dictionaries
-       'artists_pie': artist_pie.to_dict(orient='records'),
-       'shared_tracks':shared_tracks_data.to_dict(orient='records'),
-   }
-   print(group)
-   print(group_dict)
-   return jsonify({'group': group_dict})
+    # Call your display_groups function here with the specific group_id
+    group = display_group_info(mysql, headers, group_id)
+    print(group)
+    features = get_user_feature_values(mysql, username)
+    feature_diff = get_user_feature_diff(mysql, group_id, username)
+    shared_artists = shared_top_artists(mysql, group_id)
+    shared_tracks_data = shared_top_tracks(mysql, group_id)
+    artist_pie = artists_pie(mysql, group_id)
+    members = get_group_display_names(mysql, group_id)
+    group_dict = {
+        'group_id': group[0],
+        'group_name': group[1],
+        'num_members': group[2],
+        'group_members': members,
+        'features': features[1:],
+        'feature_diff': feature_diff,
+        'artists_pie': artist_pie.to_dict(orient='records')
+    }
+    try:
+        group_dict['shared_artists'] = shared_artists.to_dict(orient='records')  # Convert DataFrame to a list of dictionaries
+        group_dict['shared_tracks'] = shared_tracks_data.to_dict(orient='records'),
+    except:
+        group_dict['shared_artists'] = {}
+        group_dict['shared_tracks'] = {}
+   
+    print(group)
+    print(group_dict)
+    return jsonify({'group': group_dict})
 
 @app.route('/createDormParty/<int:group_id>')
 def create_dorm_party_route(group_id):
@@ -281,9 +312,13 @@ def create_dorm_party_route(group_id):
         return jsonify({"error": "Unauthorized"}), 401
 
     tracks = find_clusters(mysql, group_id)
+
+    #tracks, track_ids = get_recommendations(headers, tracks)
+    #create_rec_playlist(mysql, headers, tracks, track_ids, group_id)
     tracks = get_recommendations(headers, tracks)
     create_rec_playlist(mysql, headers, tracks)
     return "Success"
+
 
 
 
