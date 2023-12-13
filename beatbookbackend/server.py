@@ -324,7 +324,7 @@ def display_group_info_route(group_id):
         group_dict['shared_tracks'] = {}
 
     try:
-        group_dict['artists_pie'] = artist_pie.to_dict(orient='records')
+        group_dict['artists_pie'] = artist_pie
     except:
         group_dict['artists_pie'] = {}
    
