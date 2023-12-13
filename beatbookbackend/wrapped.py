@@ -1,5 +1,6 @@
 from pandas import DataFrame
 from decimal import Decimal
+from collections import Counter
 
 '''
 Code to implement our take on Spotify Wrapped
@@ -95,25 +96,27 @@ def shared_top_tracks(mysql, group_num):
 def shared_top_artists(mysql, group_num):
     cursor = mysql.connection.cursor()
 
-    cursor.execute("select Artist_name \
-                    from (select Q.Artist_ID, count(Q.Artist_ID) as count \
-                          from (select Artist_ID from User_Artists_All, Group_%s \
-                          where User_Artists_All.username = Group_%s.Member_username and User_Artists_All.type = 'short_term' order by User_Artists_All.date) as Q \
-                          group by Q.Artist_ID \
-                          order by count desc) as T, Artist \
-                    where T.count > 1 and Artist.Artist_ID = T.Artist_ID", (group_num, group_num))
+    cursor.execute("select Member_username from Group_%s", (group_num,))
+    users = list(cursor.fetchall())
 
-    df = DataFrame(cursor.fetchall())
-    print(df)
+    all_artists = []
+    for u in users:
+        cursor.execute("select Artist_ID \
+                        from User_Artists_All, Group_%s \
+                        where User_Artists_All.username = %s and User_Artists_All.type = 'short_term' \
+                        order by User_Artists_All.date \
+                        limit 50", (group_num, u))
+
+        data = [row[0] for row in cursor.fetchall()]
+        all_artists.append(data)
+    
+    flat_artists = [item for sublist in all_artists for item in sublist]
+    counts = Counter(flat_artists)
+    duplicates = [item for item, count in counts.items() if count > 1]
+
     cursor.close()
 
-    # Check for no shared artists
-    if len(df) == 0:
-        return []
-
-    df.columns = ['Artist Name']
-    
-    return df
+    return duplicates
 
 # Find the percentage of top songs by a single artist
 def artists_pie(mysql, group_num):
