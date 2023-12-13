@@ -152,29 +152,3 @@ def artists_pie(mysql, group_num):
 
     return df
 
-# Find the number of tracks listened to by a single group member
-def unique_tracks(mysql, group_num, username):
-    cursor = mysql.connection.cursor()
-
-    
-    cursor.execute("select Track_name, Artist_name, Album_name \
-                    from (select Track_ID, count(Track_ID) as count \
-                          from (select Track_ID from User_Tracks_All, Group_%s \
-                          where User_Tracks_All.username = Group_%s.Member_username \
-                                and User_Tracks_All.username = %s and User_Tracks_All.type = 'short_term' order by User_Tracks_All.date limit 50) as Q\
-                          group by Track_ID \
-                          order by count desc) as T, Tracks \
-                    where T.count = 1 and Tracks.Track_ID = T.Track_ID", (group_num, group_num, username))
-
-    df = DataFrame(cursor.fetchall())
-    df.columns = ['Track Name', 'Artist Name', 'Album Name']
-
-    cursor.close()
-
-    return df
-
-
-
-
-    
-

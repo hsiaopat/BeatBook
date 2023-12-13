@@ -71,26 +71,13 @@ def add_links(mysql, headers):
 def get_user_short_term_top_tracks(mysql, headers):
     username = get_user(mysql, headers)
     cursor = mysql.connection.cursor()
-    '''
-    cursor.execute("select Track_name from (select Track_name, input_order \
-                                            from User_Tracks_All, Tracks \
-                                            where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID \
-                                            order by date limit 50) as T \
-                                        order by input_order;" % username)
-    tracks = [row[0] for row in cursor.fetchall()]
-    cursor.execute("select T.Track_ID from (select Tracks.Track_ID, input_order \
-                                            from User_Tracks_All, Tracks \
-                                            where username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID \
-                                            order by date limit 50) as T \
-                                        order by input_order;" % username)
-    track_ids = [row[0] for row in cursor.fetchall()]
-    '''
     cursor.execute("select T.Track_name, T.Track_ID, T.Album_link \
                     from (select Tracks.Track_name, Tracks.Track_ID, Album_link, input_order \
                           from User_Tracks_All, Tracks, Track_Attributes \
-                          where Track_Attributes.Track_ID = Tracks.Track_ID and username = '%s' and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID \
-                          order by date limit 50) as T \
-                    order by input_order;" % username)
+                          where Track_Attributes.Track_ID = Tracks.Track_ID and username = %s and type ='short_term' and User_Tracks_All.Track_ID = Tracks.Track_ID and date = %s \
+                          order by date desc \
+                          limit 50) as T \
+                    order by input_order", (username, date.today()))
     
     data = cursor.fetchall()
     tracks = [row[0] for row in data]
@@ -104,11 +91,23 @@ def get_user_short_term_top_tracks(mysql, headers):
 def get_user_short_term_top_artists(mysql, headers):
     username = get_user(mysql, headers)
     cursor = mysql.connection.cursor()
-    cursor.execute("select T.Artist_name from (select Artist_name, input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order;" % username)
-    #cursor.execute("select Artist_name from (select Artist_name, input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order;" % username)
+    
+    cursor.execute("select T.Artist_name \
+                    from (select Artist_name, input_order \
+                            from User_Artists_All, Artist \
+                            where username = %s and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID and date = %s \
+                            order by date desc \
+                            limit 50) as T \
+                    order by input_order",  (username, date.today()))
+    
 
     artists = [row[0] for row in cursor.fetchall()]
-    cursor.execute("select T.Artist_ID from (select Artist.Artist_ID,input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order" % username)
+    print(artists)
+    
+
+    cursor.execute("select T.Artist_ID from (select Artist.Artist_ID,input_order from User_Artists_All, Artist where username = %s and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID and date = %s order by date desc limit 50) as T order by input_order", (username, date.today()))
+
+
     artist_ids = [row[0] for row in cursor.fetchall()]
     cursor.connection.commit()
     cursor.close
