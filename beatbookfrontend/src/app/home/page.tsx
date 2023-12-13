@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
 import axios from 'axios';
+import Image from 'next/image';
+
 
 const Container = styled('div')({
   display: 'flex',
@@ -106,7 +108,7 @@ const HomePage = () => {
       <div className="sm:flex items-center max-w-screen-xl">
         <div className="sm:w-1/2 p-10">
           <div className="image object-center text-center">
-            <img src="https://i.imgur.com/WbQnbas.png" />
+          <Image src="https://i.imgur.com/WbQnbas.png" width={500} height={300} alt="BeatBook Logo" />
           </div>
         </div>
         <div className="sm:w-1/2 p-5">
