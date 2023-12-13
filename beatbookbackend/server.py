@@ -22,7 +22,8 @@ CORS(app, resources={r"/toptracks": {"origins": "*"},
                     r"/leavegroup": {"origins": "*"},
                     r"/displaygroups": {"origin": "*"},
                     r"/group/*": {"origin": "*"},
-                    r"/createDormParty/*": {"origin": "*"}})
+                    r"/createDormParty/*": {"origin": "*"},
+                    r"/check-login-status": {"origin": "*"}})
 
 
 # Global headers variable
@@ -94,9 +95,6 @@ def login():
     # login function redirects to callback screen after Spotify user authorization
     return redirect(request_user_authorization())
 
-def is_logged_in():
-    global headers
-    return ('Authorization' in headers)
 
 def thread_get_tracks():
     global headers
@@ -121,6 +119,22 @@ def thread_get_artists():
         mysql.connection.commit()
         cur.close()
         print("artists done!")
+
+
+@app.route('/check-login-status', methods=['GET'])
+def check_login_status():
+    global headers
+
+    # Perform the necessary checks to determine the login status
+    # This might involve checking if the user has a valid access token, session, etc.
+    
+    # For demonstration purposes, let's assume you have a function that checks the login status
+    if 'Authorization' in headers:
+        print("HIHI")
+        return 'OK', 200
+    else:
+        print("UH OH")
+        return 'Unauthorized', 401
 
 
 @app.route('/callback')

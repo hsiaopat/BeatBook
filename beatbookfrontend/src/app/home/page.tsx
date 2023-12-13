@@ -77,12 +77,29 @@ const SpotifyLoginButton = styled(Button)({
 const HomePage = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
 
+  const checkLoginStatus = async () => {
+    try {
+      const response = await axios.get('http://129.74.153.235:5028/check-login-status');
+      if (response.status === 200) {
+        setLoggedIn(true);
+        console.log('User is logged in');
+      } else {
+        console.log('User is not logged in');
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  };
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+  
 
   const redirectToSpotify = async () => {
     try {
       const spotifyAuthUrl = 'http://129.74.153.235:5028/login';
       window.location.href = spotifyAuthUrl;
-      setLoggedIn(true);
     } catch (error) {
       console.error('Error initiating Spotify login:', error);
     }
@@ -92,9 +109,6 @@ const HomePage = () => {
 
   return (
     <div>
-      
-      
-
       <nav className="bg-white border-gray-200 dark:bg-gray-900">
           <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
             <a href="https://spotify.com" className="flex items-center space-x-3 rtl:space-x-reverse">
