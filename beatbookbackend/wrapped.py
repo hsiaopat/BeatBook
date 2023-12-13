@@ -92,7 +92,6 @@ def shared_top_tracks(mysql, group_num):
     duplicates = [item for item, count in counts.items() if count > 1]
 
     cursor.close()
-    print(duplicates)
     return duplicates
 
 # Find top artists that are shared among group members
@@ -127,28 +126,33 @@ def shared_top_artists(mysql, group_num):
 def artists_pie(mysql, group_num):
     cursor = mysql.connection.cursor()
 
-    cursor.execute("select Artist_name, count(Q.Track_ID) as count \
-                    from (select Artist_name, Tracks.Track_ID as Track_ID from User_Tracks_All, Group_%s, Tracks \
-                    where User_Tracks_All.username = Group_%s.Member_username and \
+    cursor.execute("select Member_username from Group_%s", (group_num,))
+    users = list(cursor.fetchall())
+
+    all_artists = {}
+    total = 0
+    for u in users:
+        cursor.execute("select Artist_name, count(Q.Track_ID) as count \
+                    from (select Artist_name, Tracks.Track_ID as Track_ID from User_Tracks_All, Tracks \
+                    where User_Tracks_All.username = %s and \
                           Tracks.Track_ID = User_Tracks_All.Track_ID and User_Tracks_All.type = 'short_term' order by User_Tracks_All.date limit 50) as Q \
                     group by Artist_name \
-                    order by count desc", (group_num, group_num))
+                    order by count desc", (u,))
+
+        data = cursor.fetchall()
+        artist_names = [row[0] for row in data]
+        counts = [row[1] for row in data]
+
+        for index, name in enumerate(artist_names):
+            if name not in all_artists:
+                all_artists[name] = counts[index]
+            else:
+                all_artists[name] += counts[index]
+            total += 1
+
+    # Filter for artists with more than one song and sort
+    filtered_artists = {key: round(value/total * 100, 2) for key, value in all_artists.items() if value > 1}
+    sorted_artists = sorted(filtered_artists.items(), key=lambda x: x[1], reverse=True)
     
-    df = DataFrame(cursor.fetchall())
-    cursor.close()
-    
-    print(df)
-
-    if len(df) == 0:
-        return []
-
-    df.columns = ['Artist Name', 'Num Songs']
-    
-    # Filters for artists with more than 2 songs in recent listening 
-    df = df[df['Num Songs'] > 2]
-
-    total_songs = df['Num Songs'].sum()
-    df['Percent Top Songs'] = round((df['Num Songs'] / total_songs) * 100, 2)
-
-    return df
+    return sorted_artists
 
