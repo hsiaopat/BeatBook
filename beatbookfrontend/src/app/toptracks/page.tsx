@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const TopTracksPage = () => {
    const [topTracks, setTopTracks] = useState([]);
+   const [topTrackImages, setTopTrackImages] = useState([]);
 
 
    const redirectToSpotify = async () => {
@@ -33,6 +34,23 @@ const TopTracksPage = () => {
        fetchTopTracks();
    }, []); // Empty dependency array ensures the effect runs only once on mount
 
+   useEffect(() => {
+
+
+    const fetchTopTrackImages = async () => {
+        try {
+            const response = await axios.get('http://129.74.153.235:5028/toptracks');
+            console.log('Full Response:', response.data);
+            setTopTrackImages(response.data.tracks_img);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+    fetchTopTrackImages();
+}, []); // Empty dependency array ensures the effect runs only once on mount
+
 
    return (
        <div>
@@ -59,18 +77,20 @@ const TopTracksPage = () => {
     Take a look at your top 50 tracks from the last 30 days. Tune In!
   </p>
   <ul className="mb-10">
-    {topTracks.map((track, index) => (
-      <li key={index} className="flex items-center mb-4 text-base text-black dark:text-black-400">
-        <span className="mr-3 text-blue-500 dark:text-blue-400">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-            className={`w-6 h-6 text-blue-500 dark:text-blue-400 bi bi-${index + 1}-circle-fill`} viewBox="0 0 16 16">
-            {/* Path content */}
-          </svg>
-        </span>
-        {track}
-      </li>
-    ))}
-  </ul>
+  {topTracks.map((track, index) => (
+    <li key={index} className="flex items-center mb-4 text-base text-black dark:text-black-400">
+      <img src={topTrackImages[index]} alt={`Track ${index + 1}`} className="ml-3 w-10 h-10" />
+      <span className="mr-3 text-blue-500 dark:text-blue-400">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+          className={`w-6 h-6 text-blue-500 dark:text-blue-400 bi bi-${index + 1}-circle-fill`} viewBox="0 0 16 16">
+          {/* Path content */}
+        </svg>
+      </span>
+      {track}
+    </li>
+  ))}
+</ul>
+
 </div>
 
 
