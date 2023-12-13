@@ -44,7 +44,7 @@ const GroupPage: React.FC = () => {
 
     const response = await axios.post('http://129.74.153.235:5028/joingroup', { group_id });
 
-    const groupUrl = 'http://129.74.153.235:5028/group?group_id=' + group_id;
+    const groupUrl = 'http://129.74.153.235:5029/group?group_id=' + group_id;
     window.location.href = groupUrl;
 
     // Handle the response as needed
@@ -63,7 +63,7 @@ const handleLeaveGroup = async () => {
   
     // Handle the response as needed
     console.log(response.data);
-    const groupUrl = 'http://129.74.153.235:5028/group?group_id='+ group_id;
+    const groupUrl = 'http://129.74.153.235:5029/group?group_id='+ group_id;
     window.location.href = groupUrl;
   } catch (error) {
     console.error('Error leaving the group:', error);
