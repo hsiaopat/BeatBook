@@ -85,6 +85,8 @@ def get_user_short_term_top_artists(mysql, headers):
     username = get_user(mysql, headers)
     cursor = mysql.connection.cursor()
     cursor.execute("select T.Artist_name from (select Artist_name, input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order;" % username)
+    #cursor.execute("select Artist_name from (select Artist_name, input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order;" % username)
+
     artists = [row[0] for row in cursor.fetchall()]
     cursor.execute("select T.Artist_ID from (select Artist.Artist_ID,input_order from User_Artists_All, Artist where username = '%s' and type ='short_term' and User_Artists_All.Artist_ID = Artist.Artist_ID order by date limit 50) as T order by input_order" % username)
     artist_ids = [row[0] for row in cursor.fetchall()]
@@ -173,6 +175,7 @@ def get_user_top_tracks(mysql, headers, cursor=None):
             if Track_User not in User_Track:
                 cursor.execute("insert into User_Tracks_All (Track_ID, username, type, date, input_order) values (%s, %s, %s, %s, %s)" ,        
                     (track_id, username, time, date.today(), count))
+
                 cursor.connection.commit()
             if track_id not in tracks_id_current:
                 cursor.execute("insert into Tracks (Track_ID, Track_name, Artist_ID, Artist_name, Album_ID, Album_name, duration, popularity) values (%s, %s, %s, %s, %s, %s, %s, %s)",
@@ -189,6 +192,10 @@ def get_user_top_tracks(mysql, headers, cursor=None):
             count=count+1
             if not passed_cur:
                 cursor.close() 
+
+            #count=count+1
+            #cursor.close() 
+
     
 
     return tracks, tracks_id
@@ -215,6 +222,8 @@ def get_all_user_top_artists(mysql, headers, cursor=None):
         artists_id_db = []
         artists_id = []
         username = get_user(mysql, headers, cursor)
+        #username = get_user(mysql, headers)
+
         count = 1
         for item in data['items']:
             artist_name = item['name']
@@ -239,6 +248,7 @@ def get_all_user_top_artists(mysql, headers, cursor=None):
             if Art_User not in User_Artist:
                 cursor.execute("insert into User_Artists_All (Artist_ID, username, type, date, input_order) values (%s, %s, %s, %s, %s)" ,        
                     (artist_id, username, time, date.today(), count))
+
             # If the artist id does not already exist, add to the database
             if artist_id not in artists_id_db:
                 cursor.execute("insert into Artist (Artist_ID, Artist_name) values (%s, %s)", 

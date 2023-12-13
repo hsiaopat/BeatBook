@@ -20,6 +20,9 @@ def get_user_feature_values(mysql, username):
     result = []
     result = list(cursor.fetchone())
 
+
+    #result = cursor.fetchone()
+
     if result is None:
         # Return a default value or handle the case when no data is found
         cursor.close()
@@ -27,9 +30,12 @@ def get_user_feature_values(mysql, username):
     
     result = [round(float(value), 2) if isinstance(value, Decimal) else value for value in result]
 
+
+    #result = [float(value) if isinstance(value, Decimal) else value for value in result]
     cursor.close()
 
     return result
+
 
 # Add the track features for all users in a group into a dataframe and return the average for each column
 def get_group_feature_values(mysql, group_num):
