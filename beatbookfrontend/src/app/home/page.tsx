@@ -75,16 +75,20 @@ const SpotifyLoginButton = styled(Button)({
 
 
 const HomePage = () => {
+  const [isLoggedIn, setLoggedIn] = useState(false);
+
+
   const redirectToSpotify = async () => {
     try {
       const spotifyAuthUrl = 'http://129.74.153.235:5028/login';
       window.location.href = spotifyAuthUrl;
+      setLoggedIn(true);
     } catch (error) {
       console.error('Error initiating Spotify login:', error);
     }
   };
 
-  
+
 
   return (
     <div>
@@ -128,6 +132,7 @@ const HomePage = () => {
       </div>
       <div className="flex justify-between items-center">
       {/* Container 1 */}
+      {isLoggedIn && (
       <Link href="/topartists">
         <a>
           <div className="flex flex-col items-center border border-gray-300 p-4 rounded-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer w-64 h-48">
@@ -138,8 +143,10 @@ const HomePage = () => {
           </div>
         </a>
       </Link>
+      )}
 
       {/* Container 2 */}
+      {isLoggedIn && (
       <Link href="/toptracks">
         <a>
           <div className="flex flex-col items-center border border-gray-300 p-4 rounded-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer w-64 h-48 ml-4">
@@ -150,8 +157,10 @@ const HomePage = () => {
           </div>
         </a>
       </Link>
+      )}
 
       {/* Container 3 */}
+      {isLoggedIn && (
       <Link href="/gallery">
         <a>
           <div className="flex flex-col items-center border border-gray-300 p-4 rounded-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer w-64 h-48 ml-4">
@@ -162,6 +171,7 @@ const HomePage = () => {
           </div>
         </a>
       </Link>
+      )}
     </div>
       </CenteredButtons>
     <br></br>
