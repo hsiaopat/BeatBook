@@ -16,7 +16,7 @@ interface GroupData {
   features: number[];
   feature_diff: number[];
   shared_artists: string[];
-  artists_pie: { 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }[];
+  artists_pie: [string, number][];
   shared_tracks: [string, string, string][];
   // Add more properties as needed
 }
@@ -87,10 +87,15 @@ const handleLeaveGroup = async () => {
   }
 };
 
-const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }[]) => {
+const createPieChart = (data: [string, number][]) => {
+  console.log(data); 
   const width = 800;
   const height = 400;
   const radius = Math.min(width, height) / 2;
+  const convertedData = data.map(([artistName, percentTopSongs]) => ({
+    'Artist Name': artistName,
+    'Percent Top Songs': percentTopSongs,
+  }));
 
   // Create an svg element for the pie chart and key
   const svg = d3.select('#pieChart').append('svg').attr('width', width).attr('height', height);
@@ -99,11 +104,11 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
   const pieGroup = svg.append('g').attr('transform', `translate(${width / 3},${height / 2})`);
 
   // Create a pie chart
-  const pie = d3.pie<{ 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }>().value((d) => d['Percent Top Songs']);
-  const data_ready = pie(data) as Array<d3.PieArcDatum<{ 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }>>;
+  const pie = d3.pie<{ 'Artist Name': string; 'Percent Top Songs': number }>().value((d) => d['Percent Top Songs']);
+  const data_ready = pie(convertedData) as d3.PieArcDatum<{ 'Artist Name': string; 'Percent Top Songs': number }>[];
 
   // Create arcs
-  const arc = d3.arc<d3.PieArcDatum<{ 'Artist Name': string; 'Num Songs': number; 'Percent Top Songs': number }>>().innerRadius(0).outerRadius(radius);
+  const arc = d3.arc<d3.PieArcDatum<{ 'Artist Name': string; 'Percent Top Songs': number }>>().innerRadius(0).outerRadius(radius);
 
   // Add slices to the pie chart
   const color = d3.scaleOrdinal(d3.schemeCategory10);
