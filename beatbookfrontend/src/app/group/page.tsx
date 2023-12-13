@@ -279,13 +279,19 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
         <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
         <h2 className="text-3xl font-bold mb-4 center-">Shared Artists</h2>
         </div>
-        <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {group.shared_artists.map((artist) => (
-            <li key={artist['Artist Name']} className="bg-blue-100 p-4 rounded-md">
-              {artist['Artist Name']}
-            </li>
-          ))}
-        </ul>
+        <div>
+          {group.shared_artists.length > 0 ? (
+            <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {group.shared_artists.map((artist) => (
+                <li key={artist['Artist Name']} className="bg-blue-100 p-4 rounded-md">
+                  {artist['Artist Name']}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No shared artists</p>
+          )}
+        </div>
       </div>
 
       {/* Unique Tracks Section */}
@@ -293,13 +299,19 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
       <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
         <h2 className="text-3xl font-bold mb-4 center-items">Shared Tracks</h2>
         </div>
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {group.shared_tracks.map((track, index) => (
-            <li key={index} className="bg-green-100 p-4 rounded-md">
-              <strong>{track['Track Name']}</strong> - {track['Artist Name']} - {track['Album Name']}
-            </li>
-          ))}
-        </ul>
+        <div>
+          {group.shared_tracks.length > 0 ? (
+            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {group.shared_tracks.map((track, index) => (
+                <li key={index} className="bg-green-100 p-4 rounded-md">
+                  <strong>{track['Track Name']}</strong> - {track['Artist Name']} - {track['Album Name']}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No shared tracks</p>
+          )}
+        </div>
       </div>
 
      {/* Group Features and Feature Differences Table */}
