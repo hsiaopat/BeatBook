@@ -39,8 +39,10 @@ const GroupPage: React.FC = () => {
 
  const handleJoinGroup = async () => {
   try {
+    const groupParams: [string, string][] = Array.from(searchParams.entries());
+    const group_id = groupParams.find(([key]) => key === 'group_id')?.[1];
 
-    const response = await axios.post('http://129.74.153.235:5028/joingroup');
+    const response = await axios.post('http://129.74.153.235:5028/joingroup', {group_id});
 
     // Handle the response as needed
     console.log(response.data);
@@ -52,9 +54,9 @@ const GroupPage: React.FC = () => {
 
 const handleLeaveGroup = async () => {
   try {
-    //const groupParams: [string, string][] = Array.from(searchParams.entries());
-    //const group_id = groupParams.find(([key]) => key === 'group_id')?.[1];
-    const response = await axios.post('http://129.74.153.235:5028/leavegroup');
+    const groupParams: [string, string][] = Array.from(searchParams.entries());
+    const group_id = groupParams.find(([key]) => key === 'group_id')?.[1];
+    const response = await axios.post('http://129.74.153.235:5028/leavegroup', {group_id});
 
     // Handle the response as needed
     console.log(response.data);
@@ -289,7 +291,9 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
               ))}
             </ul>
           ) : (
-            <h4 className="text-3xl font-bold mb-4 center-items">No Shared Artists</h4>
+            <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
+              <h4 className="text-3xl mb-4 center-items">No Shared Artists</h4>
+            </div>
           )}
         </div>
       </div>
@@ -309,7 +313,9 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
               ))}
             </ul>
           ) : (
-            <h4 className="text-3xl font-bold mb-4 center-items">No Shared Tracks</h4>
+            <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
+              <h4 className="text-3xl mb-4 center-items">No Shared Tracks</h4>
+            </div>
           )}
         </div>
       </div>

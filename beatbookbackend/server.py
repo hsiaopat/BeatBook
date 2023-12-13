@@ -183,7 +183,7 @@ def join_group_route():
        return jsonify({"error": "Unauthorized"}), 401
 
 
-   g_id = request.json.get('group_identifier')  # Assuming the group_id is passed in the request JSON
+   g_id = request.json.get('group_id')  # Assuming the group_id is passed in the request JSON
    if not g_id:
        return jsonify({"error": "Group ID not provided"}), 400
 
@@ -233,7 +233,7 @@ def leave_group_route():
        return jsonify({"error": "Unauthorized"}), 401
 
 
-   group_identifier = request.json.get('group_identifier')  # Assuming the group_id is passed in the request JSON
+   group_identifier = request.json.get('group_id')  # Assuming the group_id is passed in the request JSON
    if not group_identifier:
        return jsonify({"error": "Group ID not provided"}), 400
 
