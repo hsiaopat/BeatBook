@@ -108,7 +108,7 @@ const HomePage = () => {
       <div className="sm:flex items-center max-w-screen-xl">
         <div className="sm:w-1/2 p-10">
           <div className="image object-center text-center">
-          <Image src="https://i.imgur.com/WbQnbas.png" width={500} height={300} alt="BeatBook Logo" />
+            <img src="https://i.imgur.com/WbQnbas.png" />
           </div>
         </div>
         <div className="sm:w-1/2 p-5">

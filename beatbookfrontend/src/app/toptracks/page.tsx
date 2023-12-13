@@ -80,7 +80,7 @@ const TopTracksPage = () => {
   <ul className="mb-10">
   {topTracks.map((track, index) => (
     <li key={index} className="flex items-center mb-4 text-base text-black dark:text-black-400">
-      <Image src={topTrackImages[index]} alt={`Track ${index + 1}`} width={40} height={40} className="ml-3" />
+      <img src={topTrackImages[index]} alt={`Track ${index + 1}`} className="ml-3 w-10 h-10" />
       <span className="mr-3 text-blue-500 dark:text-blue-400">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
           className={`w-6 h-6 text-blue-500 dark:text-blue-400 bi bi-${index + 1}-circle-fill`} viewBox="0 0 16 16">
