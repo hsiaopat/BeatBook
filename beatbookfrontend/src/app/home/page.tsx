@@ -75,7 +75,6 @@ const SpotifyLoginButton = styled(Button)({
 
 
 const HomePage = () => {
-  const [isLoggedIn, setLoggedIn] = useState(false);
   const redirectToSpotify = async () => {
     try {
       const spotifyAuthUrl = 'http://129.74.153.235:5028/login';
@@ -85,11 +84,6 @@ const HomePage = () => {
     }
   };
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      redirectToSpotify()
-    }
-  }, []);
   
 
   return (
