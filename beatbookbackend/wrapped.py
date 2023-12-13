@@ -74,26 +74,22 @@ def shared_top_tracks(mysql, group_num):
     cursor.execute("select Member_username from Group_%s", (group_num,))
     users = list(cursor.fetchall())
 
+    # Find top short term tracks for all members of the group
     all_tracks = []
     for u in users:
-        cursor.execute("select Track_ID \
-                    from User_Tracks_All, Group_%s \
-                    where User_Tracks_All.username = %s and User_Tracks_All.type = 'short_term' \
+        cursor.execute("select Track_name, Artist_name, Album_link \
+                    from User_Tracks_All, Track_Attributes_All \
+                    where User_Tracks_All.username = %s and User_Tracks_All.type = 'short_term' and User_Tracks_All.Track_ID = Track_Attributes_All.Track_ID \
                     order by User_Tracks_All.date \
-                    limit 50", (group_num, u))
+                    limit 50", (u,))
 
-        data = [row[0] for row in cursor.fetchall()]
+        data = [(row[0], row[1], row[2]) for row in cursor.fetchall()]
         all_tracks.append(data)
     
     # Find shared tracks
     flat_tracks = [item for sublist in all_tracks for item in sublist]
     counts = Counter(flat_tracks)
     duplicates = [item for item, count in counts.items() if count > 1]
-
-    
-    
-
-    #df.columns = ['Track Name', 'Artist Name', 'Album Name']
 
     cursor.close()
 
@@ -106,6 +102,7 @@ def shared_top_artists(mysql, group_num):
     cursor.execute("select Member_username from Group_%s", (group_num,))
     users = list(cursor.fetchall())
 
+    # Find short term artists for all members of the group
     all_artists = []
     for u in users:
         cursor.execute("select Artist_name \
@@ -117,6 +114,7 @@ def shared_top_artists(mysql, group_num):
         data = [row[0] for row in cursor.fetchall()]
         all_artists.append(data)
     
+    # Find shared artists
     flat_artists = [item for sublist in all_artists for item in sublist]
     counts = Counter(flat_artists)
     duplicates = [item for item, count in counts.items() if count > 1]
