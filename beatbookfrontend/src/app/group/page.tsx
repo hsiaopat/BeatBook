@@ -335,6 +335,7 @@ const createPieChart = (data: [string, number][]) => {
     <div className="mt-8">
     <div className="mx-auto sm:flex justify-center flex flex-col items-center max-w-screen-xl h-5/6">
       <h2 className="text-3xl font-bold mb-4 center-items">Group Features</h2>
+      <p className="text-3xl mb-4 center-items">This table shows different track features based on the recent listening habits of the group as compared to your recent listening habits!</p>
       </div>
       <div className="overflow-x-auto">
         <table className="table-auto mx-auto border border-gray-400 shadow-lg rounded-md">
