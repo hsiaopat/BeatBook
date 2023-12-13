@@ -289,7 +289,7 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
               ))}
             </ul>
           ) : (
-            <p>No shared artists</p>
+            <h4 className="text-3xl font-bold mb-4 center-items">No Shared Artists</h4>
           )}
         </div>
       </div>
@@ -309,7 +309,7 @@ const createPieChart = (data: { 'Artist Name': string; 'Num Songs': number; 'Per
               ))}
             </ul>
           ) : (
-            <p>No shared tracks</p>
+            <h4 className="text-3xl font-bold mb-4 center-items">No Shared Tracks</h4>
           )}
         </div>
       </div>
