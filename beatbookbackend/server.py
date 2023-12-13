@@ -148,6 +148,8 @@ def top_tracks():
 
        # Get the user's top tracks
        tracks, tracks_id, tracks_images = get_user_short_term_top_tracks(mysql, headers)
+       print(tracks)
+       print(tracks_images)
 
        # Render a template or return the data in JSON format
        return jsonify({'tracks': tracks, 'tracks_id': tracks_id, 'tracks_img': tracks_images})
