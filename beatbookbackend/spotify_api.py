@@ -68,8 +68,9 @@ def add_links(mysql, headers):
     cursor.close()
     print('Done')
 
-def get_user_short_term_top_tracks(mysql, headers):
-    username = get_user(mysql, headers)
+def get_user_short_term_top_tracks(mysql, headers, username=None):
+    if username is None:
+        username = get_user(mysql, headers)
     cursor = mysql.connection.cursor()
     cursor.execute("select T.Track_name, T.Track_ID, T.Album_link \
                     from (select Tracks.Track_name, Tracks.Track_ID, Album_link, input_order \
@@ -88,8 +89,9 @@ def get_user_short_term_top_tracks(mysql, headers):
     cursor.close
     return tracks, track_ids, album_url
 
-def get_user_short_term_top_artists(mysql, headers):
-    username = get_user(mysql, headers)
+def get_user_short_term_top_artists(mysql, headers, username=None):
+    if username is None:
+        username = get_user(mysql, headers)
     cursor = mysql.connection.cursor()
     
     cursor.execute("select T.Artist_name \

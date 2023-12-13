@@ -1,6 +1,7 @@
 from pandas import DataFrame
 from decimal import Decimal
 from collections import Counter
+from spotify_api import get_user_short_term_top_tracks, get_user_short_term_top_artists
 
 '''
 Code to implement our take on Spotify Wrapped
@@ -77,13 +78,15 @@ def shared_top_tracks(mysql, group_num):
     # Find top short term tracks for all members of the group
     all_tracks = []
     for u in users:
+        trks,_,_ = get_user_short_term_top_tracks(mysql, {}, u)
+        
         cursor.execute("select Track_name, Artist_name, Album_link \
                     from User_Tracks_All, Track_Attributes_All \
                     where User_Tracks_All.username = %s and User_Tracks_All.type = 'short_term' and User_Tracks_All.Track_ID = Track_Attributes_All.Track_ID \
                     order by User_Tracks_All.date \
-                    limit 50", (u,))
+                    limit %s", (u, len(trks)))
 
-        data = [(row[0], row[1], row[2]) for row in cursor.fetchall()]
+        data = list(set([(row[0], row[1], row[2]) for row in cursor.fetchall()]))
         all_tracks.append(data)
     
     # Find shared tracks
@@ -104,13 +107,15 @@ def shared_top_artists(mysql, group_num):
     # Find short term artists for all members of the group
     all_artists = []
     for u in users:
+        arts,_ = get_user_short_term_top_artists(mysql, {}, u)
+        
         cursor.execute("select Artist_name \
                         from User_Artists_All, Artist \
                         where User_Artists_All.username = %s and User_Artists_All.Artist_ID = Artist.Artist_ID and User_Artists_All.type = 'short_term' \
                         order by User_Artists_All.date \
-                        limit 50", (u,))
+                        limit %s", (u, len(arts)))
 
-        data = [row[0] for row in cursor.fetchall()]
+        data = list(set([row[0] for row in cursor.fetchall()]))
         all_artists.append(data)
     
     # Find shared artists
